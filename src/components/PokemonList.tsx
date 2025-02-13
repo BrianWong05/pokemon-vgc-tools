@@ -8,7 +8,7 @@ function PokemonList() {
 
 	const pkms = Array.from(gens.get(9).species);
 
-	console.log(pkms[0])
+	// console.log(pkms[0])
 
   return (
     <div>
