@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@pkmn/data": "^0.9.29",
+    "@pkmn/dex": "^0.9.29",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
