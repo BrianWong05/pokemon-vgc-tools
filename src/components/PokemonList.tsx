@@ -1,16 +1,14 @@
-import { Generations } from '@pkmn/data';
-import { Dex } from '@pkmn/dex';
 import Pokemon from './Pokemon';
 import { useState } from 'react';
 import SearchBar from './SearchBar';
 
-function PokemonList() {
+function PokemonList({gens}) {
 
-  const [searchResults, setSearchResults] = useState([])
-
-  const gens = new Generations(Dex);
-
+  // const gens = new Generations(Dex);
+  
 	const pkms = Array.from(gens.get(9).species);
+  
+  const [searchResults, setSearchResults] = useState(pkms)
 
   const handleSearch = (query: string) => {
     const filteredResults = pkms.filter((pkm) =>
