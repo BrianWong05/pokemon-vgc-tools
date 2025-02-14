@@ -9,7 +9,7 @@ function App() {
 
   return (
     <>
-    {/* <MoveList gens={gens} /> */}
+    <MoveList gens={gens} />
     <PokemonList gens={gens}/>
     </>
   )
