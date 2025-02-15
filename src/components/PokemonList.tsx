@@ -22,9 +22,9 @@ function PokemonList({gens}) {
   return (
     <div>
     	<h2>Pokemons</h2>
-      <SearchBar onSearch={handleSearch}/>
+      <SearchBar onSearch={handleSearch} placeholder="Pokémon"/>
       {searchResults.map((pkm) => {
-        return <Pokemon pkm={pkm} />
+        return <Pokemon key={pkm.id} pkm={pkm} />
       })}
     </div>
   )

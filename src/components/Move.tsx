@@ -55,7 +55,7 @@ function Move({move}) {
           <div className="flex justify-space my-2">
             <div className="text-sm text-gray-400 m-1 px-2 py-auto rounded-xl border-2 border-gray-400">Target: {target}</div>
             {moveProp.map((prop) => {
-              return <div className="text-sm text-gray-400 m-1 px-2 py-auto rounded-xl border-2 border-gray-400">{prop} </div>
+              return <div key={prop} className="text-sm text-gray-400 m-1 px-2 py-auto rounded-xl border-2 border-gray-400">{prop} </div>
             })}
           </div>
           <div className="text-sm text-justify ml-2">{move.desc}</div>

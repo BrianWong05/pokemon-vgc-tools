@@ -17,10 +17,10 @@ function MoveList({gens}) {
   return (
     <div className="bg-[#24283B]">
     <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Moves</h2>
-    <SearchBar onSearch={handleSearch}/>
+    <SearchBar onSearch={handleSearch} placeholder="Move"/>
     <div className="flex flex-wrap justify-center">
       {searchResults.map((move) => {
-        return <Move move={move} />
+        return <Move key={move.num} move={move} />
       })};
     </div>
     </div>
