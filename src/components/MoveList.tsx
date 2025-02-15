@@ -5,12 +5,14 @@ function MoveList({gens}) {
   console.log(moves);
 
   return (
-    <>
-    <h2>Moves</h2>
-    {moves.map((move) => {
-      return <Move move={move} />
-    })};
-    </>
+    <div className="bg-[#24283B]">
+    <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Moves</h2>
+    <div className="flex flex-wrap justify-center">
+      {moves.map((move) => {
+        return <Move move={move} />
+      })};
+    </div>
+    </div>
   )
 }
 
