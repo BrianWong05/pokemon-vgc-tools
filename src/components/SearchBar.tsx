@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function SearchBar({onSearch}) {
+function SearchBar({onSearch, placeholder}) {
   const [query, setQuery] = useState('');
 
   const handleInputChange = (e) => {
@@ -10,8 +10,8 @@ function SearchBar({onSearch}) {
   };
 
   return (
-    <div>
-      <input type="text" value={query} onChange={handleInputChange} placeholder="Search..."/>
+    <div className="w-full flex justify-center">
+      <input className="bg-black w-[70%] text-gray-100 rounded-2xl py-2 px-5" type="text" value={query} onChange={handleInputChange} placeholder={placeholder}/>
     </div>
   );
 };
