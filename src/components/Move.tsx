@@ -2,11 +2,23 @@ import { icons } from "../assets/icons";
 import physical from "../assets/images/Physical_SV_icon.png"
 import special from "../assets/images/Special_SV_icon.png"
 import status from "../assets/images/Status_SV_icon.png"
+// import { typeColor } from "../assets/typeColor";
 
 const categoryIcons = {
   physical: physical,
   special: special,
   status: status,
+};
+
+const targetMap = {
+  any: "Any",
+  normal: "Any",
+  allAdjacentFoes: "All foes",
+  allAdjacent: "All",
+  self: "Self",
+  adjacentAllyOrSelf: "Ally or self",
+  adjacentAlly: "Ally",
+  allySide: "All allies",
 };
 
 function Move({move}) {
@@ -24,6 +36,8 @@ function Move({move}) {
   const priority = (move.priority ? (move.priority > 0 ? `+${move.priority}` : move.priority) : '-');
   const icon = icons[type];
   const categoryIcon = categoryIcons[category];
+  const target = targetMap[move.target];
+  // const color = typeColor[type];
   console.log(move);
   
 
@@ -37,11 +51,13 @@ function Move({move}) {
             <div className="text-2xl my-auto">{move.name}</div>
             <img src={icon} className="h-9" /> 
           </div>
-          <div className="text-sm">target: {move.target}</div>
-          {moveProp.map((prop) => {
-            return <div className="text-sm">{prop} </div>
-          })}
-          <div className="text-sm text-justify">{move.desc}</div>
+          <div className="flex justify-space my-2">
+            <div className="text-sm text-gray-400 m-1 px-2 py-auto rounded-xl border-2 border-gray-400">Target: {target}</div>
+            {moveProp.map((prop) => {
+              return <div className="text-sm text-gray-400 m-1 px-2 py-auto rounded-xl border-2 border-gray-400">{prop} </div>
+            })}
+          </div>
+          <div className="text-sm text-justify ml-2">{move.desc}</div>
         </div>
         <div className="h-50 w-30 content-center">
           <div className="text-center">
