@@ -12,6 +12,7 @@
   "dependencies": {
     "@pkmn/data": "^0.9.29",
     "@pkmn/dex": "^0.9.29",
+    "@smogon/calc": "^0.10.0",
     "@tailwindcss/vite": "^4.0.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
