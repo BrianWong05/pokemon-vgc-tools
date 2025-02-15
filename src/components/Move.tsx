@@ -19,6 +19,7 @@ const targetMap = {
   adjacentAllyOrSelf: "Ally or self",
   adjacentAlly: "Ally",
   allySide: "All allies",
+  foeSide: "All foes"
 };
 
 function Move({move}) {
