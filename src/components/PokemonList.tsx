@@ -2,13 +2,16 @@ import Pokemon from './Pokemon';
 import { useState } from 'react';
 import SearchBar from './SearchBar';
 
-function PokemonList({gens}) {
+function PokemonList({gens, onData}) {
 
   // const gens = new Generations(Dex);
   
 	const pkms = Array.from(gens.get(9).species);
   
-  const [searchResults, setSearchResults] = useState(pkms)
+  const [searchResults, setSearchResults] = useState(pkms);
+
+  const [attPkm, setAttPkm] = useState('');
+  const handleSeledtedPkmName = (name) => {setAttPkm(name)};
 
   const handleSearch = (query: string) => {
     const filteredResults = pkms.filter((pkm) =>
@@ -20,11 +23,11 @@ function PokemonList({gens}) {
 	// console.log(pkms[0])
 
   return (
-    <div>
-    	<h2>Pokemons</h2>
+    <div className="bg-[#24283B] scrollbar">
+    	<h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Pokemons</h2>
       <SearchBar onSearch={handleSearch} placeholder="Pokémon"/>
       {searchResults.map((pkm) => {
-        return <Pokemon key={pkm.id} pkm={pkm} />
+        return <Pokemon key={pkm.id} pkm={pkm} onData={onData} />
       })}
     </div>
   )
