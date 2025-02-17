@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "tailwindcss";
+
+@theme {
+  --color-bug: #9f9f28;
+  --color-dark: #4f4747;
+  --color-dragon: #576fbc;
+  --color-electric: #dfbc28;
+  --color-fairy: #e18ce1;
+  --color-fighting: #e49021;
+  --color-fire: #e4613e;
+  --color-flying: #74aad0;
+  --color-ghost: #6f4570;
+  --color-grass: #439837;
+  --color-ground: #a4733c;
+  --color-ice: #47c8c8;
+  --color-normal: #828282;
+  --color-poison: #9354cb;
+  --color-psychic: #e96c8c;
+  --color-rock: #a9a481;
+  --color-steel: #77b2cb;
+  --color-water: #3a9de2;
+}
