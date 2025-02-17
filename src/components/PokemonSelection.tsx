@@ -72,10 +72,16 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
   const handleBoostChange = (e) => {
     const key = e.target.getAttribute('id');
     const value = e.target.value;
-    setSelectedBoostValue((prevState) => ({
-      ...prevState,
-      [key]: Number(value)
-    }));
+    // setSelectedBoostValue((prevState) => ({
+    //   ...prevState,
+    //   [key]: Number(value)
+    // }));
+
+    let tmpBoost = selectedBoostValue;
+    tmpBoost[key] = Number(value);
+
+    battlepkm.boosts = tmpBoost;
+    onChangeStats(battlepkm);
   };
 
   return (
@@ -90,7 +96,7 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
       <div>
         {Object.entries(baseStats).map(([stat, value]) => {
           return <div>{stat} {value} <input type="number" value={ivs[stat]} id={stat} onChange={handleIvInputChange} />
-           <input type="number" value={evs[stat]} id={stat} onChange={handleEvInputChange} /> {} 
+           <input type="number" value={evs[stat]} id={stat} onChange={handleEvInputChange} /> {battlepkm.stats[stat]} 
            { stat === 'hp' ? null :
              <>
                 <select id={stat} value={selectedBoostValue[stat]} onChange={handleBoostChange}>
