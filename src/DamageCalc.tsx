@@ -1,25 +1,33 @@
 import { calculate, Field, Move, Pokemon } from "@smogon/calc";
 import { useState } from "react";
-import PopUp from "./components/PopUp";
-import PokemonList from "./components/PokemonList";
+import PokemonSelection from "./components/PokemonSelection";
 
 function DamageCalc ({gens}) {
+  const gen = gens.get(9);
+  const initPkm = Array.from(gen.species)[0];
+  const initIVs = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
+  const initEVs = {hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0};
 
-  const [isPopUpAttOpen, setIsPopUpAttOpen] = useState(false);
-  const [attPkm, setAttPkm] = useState('');
+  const [attPkm, setAttPkm] = useState(new Pokemon(gen, initPkm.name, {level:50, ivs: initIVs, evs: initEVs}));
+  const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, {level:50, ivs: initIVs, evs: initEVs}));
 
-  const handleSeledtedAttPkm = (name) => {
-    setAttPkm(name);
-    setIsPopUpAttOpen(false);
-  }
+  const test = new Pokemon(gen, initPkm.name, {level:50, ivs: initIVs, evs: initEVs});
+  console.log(test);
+  const handleAttPkmChange = (name) => {
+    setAttPkm(new Pokemon(gen, name, {level:50, ivs: initIVs, evs: initEVs}));
+  };
 
-  const [isPopUpDefOpen, setIsPopUpDefOpen] = useState(false);
-  const [defPkm, setDefPkm] = useState('');
+  const handleAttPkmStatsChange = (pkm) => {
+    setAttPkm(pkm.clone());
+  };
 
-  const handleSeledtedDefPkm = (name) => {
-    setDefPkm(name);
-    setIsPopUpDefOpen(false);
-  }
+  const handleDetPkmChange = (name) => {
+    setDefPkm(new Pokemon(gen, name, {level:50, ivs: initIVs, evs: initEVs}));
+  };
+
+  const handleDefPkmStatsChange = (pkm) => {
+    setDefPkm(pkm.clone());
+  };
 
   const calcDamageRange = (result) => {
     const move = result.move.name;
@@ -32,83 +40,70 @@ function DamageCalc ({gens}) {
     return [move, attackLowRange, attackHighRange]
   };
   
-  const gen = gens.get(9);
-  const attacker = new Pokemon(gen, 'Pikachu', {
-    level: 50,
-    evs: {spa: 252},
-    nature: "Timid",
-  });
-  const defender = new Pokemon(gen, 'Garchomp', {
-    level: 50,
-    evs: {hp: 252, def: 252},
-    nature: "Impish",
-  });
-  const move = new Move(gen, 'pound');
-  const field = new Field({
-    weather: 'Rain',
-    terrain: 'Electric',
-  });
+  // const gen = gens.get(9);
+  // const attacker = new Pokemon(gen, attPkm, {
+  //   level: 50,
+  //   evs: {spa: 252},
+  //   nature: "Timid",
+  // });
+  // const defender = new Pokemon(gen, defPkm, {
+  //   level: 50,
+  //   evs: {hp: 252, def: 252},
+  //   nature: "Impish",
+  // });
+  // const move = new Move(gen, 'pound');
+  // const field = new Field({
+  //   weather: 'Rain',
+  //   terrain: 'Electric',
+  // });
   // const result = calculate(gen, attacker, defender, move, field);
 
-  const result = calculate(
-    gen,
-    new Pokemon(gen, 'Gengar', {
-      item: 'Choice Specs',
-      nature: 'Timid',
-      evs: {hp: 252, spa: 252},
-      boosts: {spa: 1},
-    }),
-    new Pokemon(gen, 'Chansey', {
-      item: 'Eviolite',
-      nature: 'Calm',
-      evs: {hp: 22, spd: 252},
-      // boosts: {spd: -1},
-    }),
-    new Move(gen, 'pound')
-  );
+  // const result = calculate(
+  //   gen,
+  //   new Pokemon(gen, 'Gengar', {
+  //     item: 'Choice Specs',
+  //     nature: 'Timid',
+  //     evs: {hp: 252, spa: 252},
+  //     boosts: {spa: 1},
+  //   }),
+  //   new Pokemon(gen, 'Chansey', {
+  //     item: 'Eviolite',
+  //     nature: 'Calm',
+  //     evs: {hp: 22, spd: 252},
+  //     // boosts: {spd: -1},
+  //   }),
+  //   new Move(gen, 'pound')
+  // );
 
-  console.log(result);
+  // console.log(result);
 
-  const test = calcDamageRange(result);
-  console.log(test);
+  // const test = calcDamageRange(result);
+  // console.log(test);
 
-  const rawDesc = result.rawDesc;
-  const attackBoost = (rawDesc.attackBoost ? (rawDesc.attackBoost > 0 ? `+${rawDesc.attackBoost}` : rawDesc.attackBoost) : '');
-  const attackEVs = rawDesc.attackEVs;
-  const attackItem = rawDesc.attackerItem || '';
-  const atatckTera = rawDesc.attackerTera || '';
-  const attackName = rawDesc.attackerName;
+  // const rawDesc = result.rawDesc;
+  // const attackBoost = (rawDesc.attackBoost ? (rawDesc.attackBoost > 0 ? `+${rawDesc.attackBoost}` : rawDesc.attackBoost) : '');
+  // const attackEVs = rawDesc.attackEVs;
+  // const attackItem = rawDesc.attackerItem || '';
+  // const atatckTera = rawDesc.attackerTera || '';
+  // const attackName = rawDesc.attackerName;
 
-  const defendBoost = (rawDesc.defenseBoost ? (rawDesc.defenseBoost > 0 ? `+${rawDesc.defenseBoost}` : rawDesc.defenseBoost) : '');
-  const HPEVs = rawDesc.HPEVs;
-  const defendEVs = rawDesc.defenseEVs;
-  const defendItem = rawDesc.defenderItem || '';
-  const defendTera = rawDesc.defenderTera || '';
-  const defendName = rawDesc.defenderName;
+  // const defendBoost = (rawDesc.defenseBoost ? (rawDesc.defenseBoost > 0 ? `+${rawDesc.defenseBoost}` : rawDesc.defenseBoost) : '');
+  // const HPEVs = rawDesc.HPEVs;
+  // const defendEVs = rawDesc.defenseEVs;
+  // const defendItem = rawDesc.defenderItem || '';
+  // const defendTera = rawDesc.defenderTera || '';
+  // const defendName = rawDesc.defenderName;
 
-  const conclusion = `${attackBoost} ${attackEVs} ${attackItem} ${atatckTera} ${attackName} VS. ${defendBoost} ${HPEVs} / ${defendEVs} ${defendItem} ${defendTera} ${defendName}`
+  // const conclusion = `${attackBoost} ${attackEVs} ${attackItem} ${atatckTera} ${attackName} VS. ${defendBoost} ${HPEVs} / ${defendEVs} ${defendItem} ${defendTera} ${defendName}`
   
-  console.log(conclusion);
+  // console.log(conclusion);
+
+  console.log(attPkm, defPkm);
 
   return (
     <div>
-      test
-      <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsPopUpAttOpen(true)}>
-        Open Pokémon List
-      </div>
-      <PopUp isOpen={isPopUpAttOpen} onClose={() => {setIsPopUpAttOpen(false)}}>
-        <PokemonList gens={gens} onData={handleSeledtedAttPkm}/>
-      </PopUp>
-      <div>selected: {attPkm.name}</div>
-
-
-      <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsPopUpDefOpen(true)}>
-        Open Pokémon List
-      </div>
-      <PopUp isOpen={isPopUpDefOpen} onClose={() => {setIsPopUpDefOpen(false)}}>
-        <PokemonList gens={gens} onData={handleSeledtedDefPkm}/>
-      </PopUp>
-      <div>selected: {defPkm.name}</div>
+      <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={attPkm} onChangePkm={handleAttPkmChange} onChangeStats={handleAttPkmStatsChange} />
+      <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={defPkm} onChangePkm={handleDetPkmChange} onChangeStats={handleDefPkmStatsChange} />
     </div>
   )
 }
