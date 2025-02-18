@@ -10,9 +10,6 @@ function PokemonList({gens, onData}) {
   
   const [searchResults, setSearchResults] = useState(pkms);
 
-  const [attPkm, setAttPkm] = useState('');
-  const handleSeledtedPkmName = (name) => {setAttPkm(name)};
-
   const handleSearch = (query: string) => {
     const filteredResults = pkms.filter((pkm) =>
       pkm.name.toLowerCase().includes(query.toLowerCase())
