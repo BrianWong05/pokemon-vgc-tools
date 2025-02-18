@@ -7,14 +7,13 @@ function DamageCalc ({gens}) {
   const initPkm = Array.from(gen.species)[0];
   const initIVs = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
   const initEVs = {hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0};
+  const initLvl = 50;
 
-  const [attPkm, setAttPkm] = useState(new Pokemon(gen, initPkm.name, {level:50, ivs: initIVs, evs: initEVs}));
-  const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, {level:50, ivs: initIVs, evs: initEVs}));
-
-  const test = new Pokemon(gen, initPkm.name, {level:50, ivs: initIVs, evs: initEVs});
-  console.log(test);
+  const [attPkm, setAttPkm] = useState(new Pokemon(gen, initPkm.name, {level:initLvl, ivs: initIVs, evs: initEVs}));
+  const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, {level:initLvl, ivs: initIVs, evs: initEVs}));
+  
   const handleAttPkmChange = (name) => {
-    setAttPkm(new Pokemon(gen, name, {level:50, ivs: initIVs, evs: initEVs}));
+    setAttPkm(new Pokemon(gen, name, {level:initLvl, ivs: initIVs, evs: initEVs}));
   };
 
   const handleAttPkmStatsChange = (pkm) => {
@@ -22,12 +21,22 @@ function DamageCalc ({gens}) {
   };
 
   const handleDetPkmChange = (name) => {
-    setDefPkm(new Pokemon(gen, name, {level:50, ivs: initIVs, evs: initEVs}));
+    setDefPkm(new Pokemon(gen, name, {level:initLvl, ivs: initIVs, evs: initEVs}));
   };
 
   const handleDefPkmStatsChange = (pkm) => {
     setDefPkm(pkm.clone());
   };
+
+  const handlePkmLvlChange = (e) => {
+    const lvl = Number(e.target.value);
+    const pkm = [attPkm.clone(), defPkm.clone()];
+    console.log(lvl);
+    pkm[0].level = lvl;
+    pkm[1].level = lvl;
+    setAttPkm(pkm[0].clone());
+    setDefPkm(pkm[1].clone());
+  }
 
   const calcDamageRange = (result) => {
     const move = result.move.name;
@@ -102,6 +111,7 @@ function DamageCalc ({gens}) {
 
   return (
     <div>
+      <div className="flex gap-x-2"><button value={50} onClick={handlePkmLvlChange}>50</button><button value={100}  onClick={handlePkmLvlChange}>100</button></div>
       <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={attPkm} onChangePkm={handleAttPkmChange} onChangeStats={handleAttPkmStatsChange} />
       <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={defPkm} onChangePkm={handleDetPkmChange} onChangeStats={handleDefPkmStatsChange} />
     </div>

@@ -3,20 +3,14 @@ import PopUp from "./PopUp";
 import PokemonList from "./PokemonList";
 
 function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats}) {
-  const initIVs = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
-  const initEVs = {hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0};
 
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [selectedpkm, setSelectedPkm] = useState(initPkm);
-  const [ivs, setIvs] = useState(initIVs);
-  const [evs, setEvs] = useState(initEVs);
+  // const [test, setTest] = useState(battlepkm);
 
   const handleSeledtedPkm = (pkm) => {
     setSelectedPkm(pkm);
     onChangePkm(pkm.name);
-    setEvs(initEVs);
-    setIvs(initIVs);
-    setSelectedBoostValue(initBoostValue);
     setIsPopUpOpen(false);
   };
 
@@ -28,8 +22,8 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
     } else {
       value = Math.max(0, Math.min(value, 31));
     }
-    let tmpIvs = ivs;
-    tmpIvs[key] = value;
+    const ivs = battlepkm.ivs;
+    ivs[key] = value;
 
     battlepkm.ivs = ivs;
     onChangeStats(battlepkm);
@@ -43,19 +37,27 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
     } else {
       value = Math.max(0, Math.min(value, 252));
     }
-    let tmpEvs = evs;
-    tmpEvs[key] = value;
+    const evs = battlepkm.evs;
+    evs[key] = value;
 
     battlepkm.evs = evs;
     onChangeStats(battlepkm);
   };
 
+  const handleLevelChange = (e) => {
+    const lvl = Number(e.target.value);
+    // const pkm = test.clone();
+    // pkm.level = lvl;
+    // setTest(pkm);
+    console.log(lvl);
+    battlepkm.level = lvl;
+    onChangeStats(battlepkm);
+  }
+
   const baseStats = selectedpkm.baseStats;
 
   const startRange = 6;
   const endRange = -6;
-  const initBoostValue = {atk: 0, def: 0, spa: 0, spd: 0, spe: 0};
-  const [selectedBoostValue, setSelectedBoostValue] = useState(initBoostValue);
 
     const generateOptions = () => {
       const options = [];
@@ -72,15 +74,11 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
   const handleBoostChange = (e) => {
     const key = e.target.getAttribute('id');
     const value = e.target.value;
-    // setSelectedBoostValue((prevState) => ({
-    //   ...prevState,
-    //   [key]: Number(value)
-    // }));
 
-    let tmpBoost = selectedBoostValue;
-    tmpBoost[key] = Number(value);
+    const boost = battlepkm.boosts;
+    boost[key] = Number(value);
 
-    battlepkm.boosts = tmpBoost;
+    battlepkm.boosts = boost;
     onChangeStats(battlepkm);
   };
 
@@ -93,18 +91,21 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
         <PokemonList gens={gens} onData={handleSeledtedPkm}/>
       </PopUp>
       <div>selected: {selectedpkm.name}</div>
+      <div className="flex gap-x-2">level: {battlepkm.level}<button value="50" onClick={handleLevelChange} >50</button><button value="100" onClick={handleLevelChange}>100</button></div>
       <div>
         {Object.entries(baseStats).map(([stat, value]) => {
-          return <div>{stat} {value} <input type="number" value={ivs[stat]} id={stat} onChange={handleIvInputChange} />
-           <input type="number" value={evs[stat]} id={stat} onChange={handleEvInputChange} /> {battlepkm.stats[stat]} 
-           { stat === 'hp' ? null :
-             <>
-                <select id={stat} value={selectedBoostValue[stat]} onChange={handleBoostChange}>
-                  {generateOptions()}
-                </select>
-                {selectedBoostValue[stat]}
-              </>
-           }
+          return <div>{stat} {value} 
+          <input type="number" value={battlepkm.ivs[stat]} id={stat} onChange={handleIvInputChange} /> 
+          <input type="number" value={battlepkm.evs[stat]} id={stat} onChange={handleEvInputChange} /> 
+          { battlepkm.stats[stat] } 
+          { stat === 'hp' ? null :
+            <>
+              <select id={stat} value={battlepkm.boosts[stat]} onChange={handleBoostChange}>
+                {generateOptions()}
+              </select>
+              {battlepkm.boosts[stat]}
+            </>
+          }
       </div>
         })}
       </div>
