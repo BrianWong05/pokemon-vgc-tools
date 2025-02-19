@@ -4,6 +4,8 @@ import PokemonList from "./PokemonList";
 
 function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats}) {
 
+  const statsMap = {hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "Spd", spe: "Spe"};
+
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [selectedpkm, setSelectedPkm] = useState(initPkm);
   // const [test, setTest] = useState(battlepkm);
@@ -92,21 +94,27 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
       </PopUp>
       <div>selected: {selectedpkm.name}</div>
       <div className="flex gap-x-2">level: {battlepkm.level}<button value="50" onClick={handleLevelChange} >50</button><button value="100" onClick={handleLevelChange}>100</button></div>
-      <div>
+      <div className="grid grid-cols-7 gap-y-1 w-100">
+        <div className="col-span-1"></div>
+        <div>Base</div>
+        <div>IVs</div>
+        <div className="col-span-4">Evs</div>
         {Object.entries(baseStats).map(([stat, value]) => {
-          return <div>{stat} {value} 
-          <input type="number" value={battlepkm.ivs[stat]} id={stat} onChange={handleIvInputChange} /> 
-          <input type="number" value={battlepkm.evs[stat]} id={stat} onChange={handleEvInputChange} /> 
-          { battlepkm.stats[stat] } 
-          { stat === 'hp' ? null :
+          return <>
+            <div className="text-center">{statsMap[stat]}</div>
+            <div>{value}</div>
+            <div className="w-12.5"><input className="w-full" type="number" value={battlepkm.ivs[stat]} id={stat} onChange={handleIvInputChange} /></div>
+            <div className="w-12.5"><input className="w-full" type="number" value={battlepkm.evs[stat]} id={stat} onChange={handleEvInputChange} /></div>
+            <div>{ battlepkm.stats[stat] } </div>
+          { stat === 'hp' ? <div className="col-span-2" /> :
             <>
-              <select id={stat} value={battlepkm.boosts[stat]} onChange={handleBoostChange}>
+              <select className="w-10" id={stat} value={battlepkm.boosts[stat]} onChange={handleBoostChange}>
                 {generateOptions()}
               </select>
-              {battlepkm.boosts[stat]}
+              <div>{battlepkm.boosts[stat] ? battlepkm.boosts[stat] : ''}</div>
             </>
           }
-      </div>
+      </>
         })}
       </div>
     </div>
