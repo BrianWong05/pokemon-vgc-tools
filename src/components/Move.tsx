@@ -2,7 +2,6 @@ import { icons } from "../assets/icons";
 import physical from "../assets/images/Physical_SV_icon.png"
 import special from "../assets/images/Special_SV_icon.png"
 import status from "../assets/images/Status_SV_icon.png"
-// import { typeColor } from "../assets/typeColor";
 
 const categoryIcons = {
   physical: physical,
@@ -38,9 +37,8 @@ function Move({move}) {
   const icon = icons[type];
   const categoryIcon = categoryIcons[category];
   const target = targetMap[move.target];
-  // const color = typeColor[type];
   console.log(move);
-  
+
 
   return (
     <>
