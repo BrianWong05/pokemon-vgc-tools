@@ -15,6 +15,7 @@ function Item ({item, onData}) {
           {name}
         </div>
       </div>
+      <hr className="w-xl border-gray-700" />
     </div>
   )
 }
