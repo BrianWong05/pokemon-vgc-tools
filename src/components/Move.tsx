@@ -21,7 +21,7 @@ const targetMap = {
   foeSide: "All foes"
 };
 
-function Move({move}) {
+function Move({move, onData, id}) {
 
   const props = ["contact", "heal", "power", "bite", "bullet", "slicing", "wind", "dance", "pulse", "sound", "punch"];
   const flags = Object.keys(move.flags);
@@ -37,12 +37,17 @@ function Move({move}) {
   const icon = icons[type];
   const categoryIcon = categoryIcons[category];
   const target = targetMap[move.target];
-  console.log(move);
+  // console.log(move);
 
+  const selectedMove = () => {
+    if (onData) {
+      onData(move, id);
+    }
+  }
 
   return (
     <>
-    <div>
+    <div onClick={selectedMove}>
       <div className={`text-gray-200 flex w-xl`}>
         <div className="block pl-5 py-5 justify-between w-full">
           <div className="flex justify-between">

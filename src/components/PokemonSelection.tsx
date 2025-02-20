@@ -2,19 +2,35 @@ import { useState } from "react"
 import PopUp from "./PopUp";
 import PokemonList from "./PokemonList";
 import NatureList from "./NatureList";
+import MoveList from "./MoveList";
 
 function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats}) {
 
   const statsMap = {hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "Spd", spe: "Spe"};
+  const AttPkmMove = { 0: null, 1: null, 2: null, 3: null };
 
-  const [isPopUpOpen, setIsPopUpOpen] = useState(false);
+  const [isPkmOpen, setIsPkmOpen] = useState(false);
+  const [isMoveOpen, setIsMoveOpen] = useState([false, false, false, false]);
   const [selectedpkm, setSelectedPkm] = useState(initPkm);
+  const [selectedmove, setSelectedMove] = useState(AttPkmMove);
 
   const handleSeledtedPkm = (pkm) => {
     setSelectedPkm(pkm);
     onChangePkm(pkm.name);
-    setIsPopUpOpen(false);
+    setIsPkmOpen(false);
   };
+
+  const handleSeledtedMove = (move, id) => {
+    const tmp = selectedmove;
+    tmp[id] = move.name;
+    setSelectedMove(tmp);
+    console.log(tmp, selectedmove);
+    setIsMoveOpen(isMoveOpen.map((value, index) => (Number(index) === Number(id) ? false : value)))
+
+    console.log(id, Object.values(selectedmove));
+    battlepkm.moves = Object.values(selectedmove);
+    onChangeStats(battlepkm);
+  }
 
   const handleIvInputChange = (e) => {
     const key = e.target.getAttribute('id');
@@ -89,11 +105,11 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
   };
 
   return (
-    <div>
-      <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsPopUpOpen(true)}>
+    <div className="w-fit">
+      <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsPkmOpen(true)}>
         Open Pokémon List
       </div>
-      <PopUp isOpen={isPopUpOpen} onClose={() => {setIsPopUpOpen(false)}}>
+      <PopUp isOpen={isPkmOpen} onClose={() => {setIsPkmOpen(false)}}>
         <PokemonList gens={gens} onData={handleSeledtedPkm}/>
       </PopUp>
       <div>selected: {selectedpkm.name}</div>
@@ -123,6 +139,22 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
       </div>
       <div>
         Nature: <NatureList gens={gens} onData={handlePkmNatureChange} init={battlepkm.nature} />
+      </div>
+      <div>
+        {
+          Object.keys(AttPkmMove).map((i) => {
+            return (
+              <>
+                <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsMoveOpen(isMoveOpen.map((value, index) => (Number(index) === Number(i) ? true : value)))}>
+                  {selectedmove[i] ? selectedmove[i] : 'Select Move'}
+                </div>
+                <PopUp isOpen={isMoveOpen[i]} onClose={() => setIsMoveOpen(isMoveOpen.map((value, index) => (Number(index) === Number(i) ? false : value)))}>
+                  <MoveList id={i} gens={gens} onData={handleSeledtedMove}/>
+                </PopUp>
+              </>
+            )
+          })
+        }
       </div>
     </div>
   )

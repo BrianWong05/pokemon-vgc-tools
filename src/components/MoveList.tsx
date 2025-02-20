@@ -2,7 +2,7 @@ import { useState } from "react";
 import Move from "./Move";
 import SearchBar from "./SearchBar";
 
-function MoveList({gens}) {
+function MoveList({gens, onData, id}) {
   const moves = Array.from(gens.get(9).moves);
   
   const [searchResults, setSearchResults] = useState(moves);
@@ -20,7 +20,7 @@ function MoveList({gens}) {
     <SearchBar onSearch={handleSearch} placeholder="Move"/>
     <div className="flex flex-wrap justify-center">
       {searchResults.map((move) => {
-        return <Move key={move.num} move={move} />
+        return <Move key={move.num} move={move} onData={onData} id={id} />
       })};
     </div>
     </div>
