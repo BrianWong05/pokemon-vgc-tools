@@ -1,6 +1,7 @@
 import { useState } from "react"
 import PopUp from "./PopUp";
 import PokemonList from "./PokemonList";
+import NatureList from "./NatureList";
 
 function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats}) {
 
@@ -8,7 +9,6 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
 
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [selectedpkm, setSelectedPkm] = useState(initPkm);
-  // const [test, setTest] = useState(battlepkm);
 
   const handleSeledtedPkm = (pkm) => {
     setSelectedPkm(pkm);
@@ -48,9 +48,6 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
 
   const handleLevelChange = (e) => {
     const lvl = Number(e.target.value);
-    // const pkm = test.clone();
-    // pkm.level = lvl;
-    // setTest(pkm);
     console.log(lvl);
     battlepkm.level = lvl;
     onChangeStats(battlepkm);
@@ -61,17 +58,17 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
   const startRange = 6;
   const endRange = -6;
 
-    const generateOptions = () => {
-      const options = [];
-      for (let i = startRange; i >= endRange; i--) {
-        options.push(
-          <option key={i} value={i.toString()}>
-            {i > 0 ? `+${i}` : (i === 0 ? '-' : i)}
-          </option>
-        );
-      }
-      return options;
-    };
+  const generateOptions = () => {
+    const options = [];
+    for (let i = startRange; i >= endRange; i--) {
+      options.push(
+        <option key={i} value={i.toString()}>
+          {i > 0 ? `+${i}` : (i === 0 ? '-' : i)}
+        </option>
+      );
+    }
+    return options;
+  };
 
   const handleBoostChange = (e) => {
     const key = e.target.getAttribute('id');
@@ -81,6 +78,13 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
     boost[key] = Number(value);
 
     battlepkm.boosts = boost;
+    onChangeStats(battlepkm);
+  };
+
+  const handlePkmNatureChange = (e) => {
+    const value = e.target.value;
+
+    battlepkm.nature = value;
     onChangeStats(battlepkm);
   };
 
@@ -116,6 +120,9 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
           }
       </>
         })}
+      </div>
+      <div>
+        Nature: <NatureList gens={gens} onData={handlePkmNatureChange} init={battlepkm.nature} />
       </div>
     </div>
   )
