@@ -3,13 +3,16 @@ import PopUp from "./PopUp";
 import PokemonList from "./PokemonList";
 import NatureList from "./NatureList";
 import MoveList from "./MoveList";
+import ItemList from "./ItemList";
 
 function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats}) {
 
   const statsMap = {hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "Spd", spe: "Spe"};
   const AttPkmMove = { 0: null, 1: null, 2: null, 3: null };
-  
+  const heldItem = battlepkm.item;
+
   const [isPkmOpen, setIsPkmOpen] = useState(false);
+  const [isItemOpen, setIsItemOpen] = useState(false);
   const [isMoveOpen, setIsMoveOpen] = useState([false, false, false, false]);
   const [selectedpkm, setSelectedPkm] = useState(initPkm);
   const [selectedmove, setSelectedMove] = useState(AttPkmMove);
@@ -29,6 +32,13 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
     setIsMoveOpen(isMoveOpen.map((value, index) => (Number(index) === Number(id) ? false : value)))
 
     battlepkm.moves = Object.values(selectedmove);
+    onChangeStats(battlepkm);
+  }
+
+  const handleSeledtedItem = (item) => {
+    setIsItemOpen(false);
+
+    battlepkm.item = item.name;
     onChangeStats(battlepkm);
   }
 
@@ -154,6 +164,12 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
           })}
         </select>
       </div>
+      <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsItemOpen(true)}>
+        {heldItem ? heldItem : "Select Item"}
+      </div>
+      <PopUp isOpen={isItemOpen} onClose={() => {setIsItemOpen(false)}}>
+        <ItemList gens={gens} onData={handleSeledtedItem}/>
+      </PopUp>
       <div>
         {
           Object.keys(AttPkmMove).map((i) => {
