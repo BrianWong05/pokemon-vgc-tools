@@ -43,10 +43,21 @@ function DamageCalc ({gens}) {
     const damages = result.damage;
     const defendPkm = result.defender;
   
+    const drain = result.move.drain ? result.move.drain : null;
+    const recoil = result.move.recoil ? result.move.recoil : null;
     const defendPkmHP = defendPkm.stats.hp;
     const attackLowRange = parseFloat((damages[0]/defendPkmHP * 100).toFixed(1));
     const attackHighRange = parseFloat((damages[15]/defendPkmHP * 100).toFixed(1));
-    return [move, attackLowRange, attackHighRange]
+    console.log(result, drain, recoil)
+
+    const returnObj = {[move]: `${attackLowRange}% - ${attackHighRange}%`};
+    if ( drain ) {
+      returnObj[move] = `${returnObj[move]} (${parseFloat((attackLowRange*drain[0]/drain[1]).toFixed(1))}% - ${parseFloat((attackHighRange*drain[0]/drain[1]).toFixed(1))}% recovered)`
+    }
+    if ( recoil ) {
+      returnObj[move] = `${returnObj[move]} (${parseFloat((attackLowRange*recoil[0]/recoil[1]).toFixed(1))}% - ${parseFloat((attackHighRange*recoil[0]/recoil[1]).toFixed(1))}% recoiled)`
+    }
+    return returnObj;
   };
   
   // const move = new Move(gen, 'pound');
@@ -59,7 +70,7 @@ function DamageCalc ({gens}) {
   attPkm.moves.forEach((move, index) => {
     const result = move ? calculate(gen, attPkm, defPkm, new Move(gen, move)) : null;
     // console.log(result);
-    damageRange[index] = result ? calcDamageRange(result) : ["No Move", 0, 0];
+    damageRange[index] = result ? calcDamageRange(result) : {"No Move": "0% - 0%"};
   })
   console.log(damageRange);
 
