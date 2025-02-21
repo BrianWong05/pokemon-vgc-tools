@@ -8,26 +8,26 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
 
   const statsMap = {hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "Spd", spe: "Spe"};
   const AttPkmMove = { 0: null, 1: null, 2: null, 3: null };
-
+  
   const [isPkmOpen, setIsPkmOpen] = useState(false);
   const [isMoveOpen, setIsMoveOpen] = useState([false, false, false, false]);
   const [selectedpkm, setSelectedPkm] = useState(initPkm);
   const [selectedmove, setSelectedMove] = useState(AttPkmMove);
+  const [pkmAbility, setPkmAbility] = useState(Object.values(initPkm.abilities));
 
   const handleSeledtedPkm = (pkm) => {
     setSelectedPkm(pkm);
     onChangePkm(pkm.name);
+    setPkmAbility(Object.values(pkm.abilities));
     setIsPkmOpen(false);
   };
 
   const handleSeledtedMove = (move, id) => {
-    const tmp = selectedmove;
-    tmp[id] = move.name;
-    setSelectedMove(tmp);
-    console.log(tmp, selectedmove);
+    const tmpMove = selectedmove;
+    tmpMove[id] = move.name;
+    setSelectedMove(tmpMove);
     setIsMoveOpen(isMoveOpen.map((value, index) => (Number(index) === Number(id) ? false : value)))
 
-    console.log(id, Object.values(selectedmove));
     battlepkm.moves = Object.values(selectedmove);
     onChangeStats(battlepkm);
   }
@@ -104,6 +104,13 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
     onChangeStats(battlepkm);
   };
 
+  const handlePkmAbilityChange = (e) => {
+    const value = e.target.value;
+
+    battlepkm.ability = value;
+    onChangeStats(battlepkm);
+  }
+
   return (
     <div className="w-fit">
       <div className="mt-4 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-800" onClick={() => setIsPkmOpen(true)}>
@@ -139,6 +146,13 @@ function PokemonSelection ({gens, initPkm, battlepkm, onChangePkm, onChangeStats
       </div>
       <div>
         Nature: <NatureList gens={gens} onData={handlePkmNatureChange} init={battlepkm.nature} />
+      </div>
+      <div>
+        Ability: <select onChange={handlePkmAbilityChange}>
+          {pkmAbility.map((ability) => {
+              return <option> {ability} </option>
+          })}
+        </select>
       </div>
       <div>
         {
