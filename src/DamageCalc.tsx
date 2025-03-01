@@ -1,6 +1,7 @@
 import { calculate, Field, Move, Pokemon } from "@smogon/calc";
 import { useState } from "react";
 import PokemonSelection from "./components/PokemonSelection";
+import CalcMoveDamage from "./components/CalcMoveDamage";
 
 function DamageCalc ({gens}) {
   const gen = gens.get(9);
@@ -9,15 +10,15 @@ function DamageCalc ({gens}) {
   const initEVs = {hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0};
   const initLvl = 50;
 
-  const [attPkm, setAttPkm] = useState(new Pokemon(gen, initPkm.name, {level:initLvl, ivs: initIVs, evs: initEVs}));
+  const [atkPkm, setAtkPkm] = useState(new Pokemon(gen, initPkm.name, {level:initLvl, ivs: initIVs, evs: initEVs}));
   const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, {level:initLvl, ivs: initIVs, evs: initEVs}));
   
   const handleAttPkmChange = (name) => {
-    setAttPkm(new Pokemon(gen, name, {level:initLvl, ivs: initIVs, evs: initEVs}));
+    setAtkPkm(new Pokemon(gen, name, {level:initLvl, ivs: initIVs, evs: initEVs}));
   };
 
   const handleAttPkmStatsChange = (pkm) => {
-    setAttPkm(pkm.clone());
+    setAtkPkm(pkm.clone());
   };
 
   const handleDetPkmChange = (name) => {
@@ -30,11 +31,11 @@ function DamageCalc ({gens}) {
 
   const handlePkmLvlChange = (e) => {
     const lvl = Number(e.target.value);
-    const pkm = [attPkm.clone(), defPkm.clone()];
+    const pkm = [atkPkm.clone(), defPkm.clone()];
     console.log(lvl);
     pkm[0].level = lvl;
     pkm[1].level = lvl;
-    setAttPkm(pkm[0].clone());
+    setAtkPkm(pkm[0].clone());
     setDefPkm(pkm[1].clone());
   }
 
@@ -66,13 +67,13 @@ function DamageCalc ({gens}) {
   //   terrain: 'Electric',
   // });
   
-  const damageRange = {};
-  attPkm.moves.forEach((move, index) => {
-    const result = move ? calculate(gen, attPkm, defPkm, new Move(gen, move)) : null;
+  const damageRange = {0: {"No Move": "0% - 0%"}, 1: {"No Move": "0% - 0%"}, 2: {"No Move": "0% - 0%"}, 3: {"No Move": "0% - 0%"}};
+  atkPkm.moves.forEach((move, index) => {
+    const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move)) : null;
     // console.log(result);
     damageRange[index] = result ? calcDamageRange(result) : {"No Move": "0% - 0%"};
   })
-  console.log(damageRange);
+  console.log(Object.values(damageRange));
 
   // const rawDesc = result.rawDesc;
   // const attackBoost = (rawDesc.attackBoost ? (rawDesc.attackBoost > 0 ? `+${rawDesc.attackBoost}` : rawDesc.attackBoost) : '');
@@ -92,13 +93,32 @@ function DamageCalc ({gens}) {
   
   // console.log(conclusion);
 
-  console.log(attPkm, defPkm);
+  console.log(atkPkm, defPkm);
 
   return (
-    <div className="flex justify-between p-10">
-      <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={attPkm} onChangePkm={handleAttPkmChange} onChangeStats={handleAttPkmStatsChange} />
-      <div className="flex gap-x-2"><button value={50} onClick={handlePkmLvlChange}>Level 50</button><button value={100}  onClick={handlePkmLvlChange}>Level 100</button></div>
-      <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={defPkm} onChangePkm={handleDetPkmChange} onChangeStats={handleDefPkmStatsChange} />
+    <div className="flex flex-col">
+      <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
+      {/* <div className="w-full">
+        <div className="w-fit">
+          {Object.values(damageRange).map((damage) => {
+            return (<>
+              {Object.entries(damage).map(([move, range]) => {
+                return (
+                  <div className="flex m-2">
+                    <div className="w-35 p-1 bg-gray-300 rounded-xl text-center">{move}</div>
+                    <div className="pl-5 text-center my-auto">{range}</div>
+                  </div>
+                )
+              })}
+            </>)
+          })}
+        </div>
+      </div> */}
+      <div className="flex justify-between p-10">
+        <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={atkPkm} onChangePkm={handleAttPkmChange} onChangeStats={handleAttPkmStatsChange} />
+        <div className="flex gap-x-2"><button value={50} onClick={handlePkmLvlChange}>Level 50</button><button value={100}  onClick={handlePkmLvlChange}>Level 100</button></div>
+        <PokemonSelection gens={gens} initPkm={initPkm} battlepkm={defPkm} onChangePkm={handleDetPkmChange} onChangeStats={handleDefPkmStatsChange} />
+      </div>
     </div>
   )
 }
