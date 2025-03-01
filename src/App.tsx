@@ -1,19 +1,13 @@
-import { Generations } from '@pkmn/data';
-import { Dex } from '@pkmn/dex';
-import PokemonList from './components/PokemonList';
-import MoveList from './components/MoveList';
-import './App.css'
+import { Generations } from "@pkmn/data";
+import { Dex } from "@pkmn/dex";
+import { RouterProvider } from "react-router-dom";
+import router from "./routes";
 
 function App() {
-  
-  const gens = new Generations(Dex)
+  // const gens = new Generations(Dex);
+  // console.log(Object.values(gens.get(9).conditions));
 
-  return (
-    <>
-    <MoveList gens={gens} />
-    {/* <PokemonList gens={gens}/> */}
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
