@@ -13,6 +13,7 @@ function DamageCalc({ gens }) {
   const [atkPkm, setAtkPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [resultDesc, setResultDesc] = useState("");
+  const [possibleDamage, setPossibleDamage] = useState("");
 
   const handleAttPkmChange = (name) => {
     setAtkPkm(new Pokemon(gen, name, { level: initLvl, ivs: initIVs, evs: initEVs }));
@@ -31,8 +32,8 @@ function DamageCalc({ gens }) {
   };
 
   const cmp = (a, b) => {
-    if (a.maxDamage < b.maxDamage) return 1;
-    if (a.maxDamage > b.maxDamage) return -1;
+    if (a.damageRange[15] < b.damageRange[15]) return 1;
+    if (a.damageRange[15] > b.damageRange[15]) return -1;
     return 0;
   };
 
@@ -111,14 +112,14 @@ function DamageCalc({ gens }) {
 
   atkPkm.moves.forEach((move, index) => {
     const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move)) : null;
-    console.log("result", result);
+    // console.log("result", result);
     damagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
-    damageRange[index] = result ? [result.damage[0], result.damage[15]] : [0, 0];
+    damageRange[index] = result ? result.damage : [0, 0];
     rawDescs[index] = result?.rawDesc;
   });
 
-  console.log("raw", rawDescs);
-  console.log("damage", damageRange);
+  // console.log("raw", rawDescs);
+  // console.log("damage", damageRange);
 
   const getResultDesc = (rawDescs) => {
     const resultDescs = {};
@@ -146,14 +147,14 @@ function DamageCalc({ gens }) {
         const defendTera = value.defenderTera ? value.defenderTera + " " : "";
         const defendName = value.defenderName;
         const minDamage = Object.values(damageRange[key])[0];
-        const maxDamage = Object.values(damageRange[key])[1];
+        const maxDamage = Object.values(damageRange[key])[15];
 
         const conclusion = `${attackBoost}${attackEVs} ${attackItem}${atatckTera}${attackName} ${Object.keys(
           damagePercentageRange[key],
         )} VS. ${defendBoost}${HPEVs} / ${defendEVs} ${defendItem}${defendTera}${defendName}: ${minDamage}-${maxDamage} (${Object.values(
           damagePercentageRange[key],
         )})`;
-        resultDescs[key] = { conclusion: conclusion, maxDamage: maxDamage };
+        resultDescs[key] = { conclusion: conclusion, damageRange: damageRange[key] };
         console.log(resultDescs);
       }
     });
@@ -161,18 +162,28 @@ function DamageCalc({ gens }) {
   };
 
   const conclusion = getResultDesc(rawDescs);
+  console.log("con", conclusion);
 
   console.log(atkPkm, defPkm);
 
   useEffect(() => {
-    if (!isEmpty(conclusion))
-      setResultDesc(Object.entries(conclusion).sort((a, b) => cmp(a[1], b[1]))[0][1]["conclusion"] || "");
+    if (!isEmpty(conclusion)) {
+      const key = Object.entries(conclusion).sort((a, b) => cmp(a[1], b[1]))[0][0];
+      console.log("last one", key, conclusion[key]["damageRange"]);
+      setResultDesc(conclusion[key]["conclusion"] || "");
+      setPossibleDamage(conclusion[key]["damageRange"].toString());
+    }
   }, [conclusion]);
 
   return (
     <div className="flex flex-col">
-      <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
-      <div>{resultDesc}</div>
+      <div className="mx-10">
+        <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
+        <div className="text-lg font-black mt-2 ml-2">
+          <div>{resultDesc}</div>
+          <div className="text-sm font-light">{possibleDamage && `Posible Damage amounts: (${possibleDamage})`}</div>
+        </div>
+      </div>
       <div className="flex justify-between p-10">
         <PokemonSelection
           gens={gens}
