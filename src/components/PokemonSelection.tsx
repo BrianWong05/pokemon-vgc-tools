@@ -134,7 +134,7 @@ function PokemonSelection({ gens, initPkm, battlepkm, onChangePkm, onChangeStats
           setIsPkmOpen(false);
         }}
       >
-        <PokemonList gens={gens} onData={handleSeledtedPkm} />
+        <PokemonList gens={gens} onData={handleSeledtedPkm} hidden={true} />
       </PopUp>
       <div>selected: {selectedpkm.name}</div>
       <div className="flex gap-x-2">
@@ -212,7 +212,7 @@ function PokemonSelection({ gens, initPkm, battlepkm, onChangePkm, onChangeStats
           setIsItemOpen(false);
         }}
       >
-        <ItemList gens={gens} onData={handleSeledtedItem} />
+        <ItemList gens={gens} onData={handleSeledtedItem} hidden={true} />
       </PopUp>
       <div>
         {Object.keys(AttPkmMove).map((i) => {
@@ -232,7 +232,7 @@ function PokemonSelection({ gens, initPkm, battlepkm, onChangePkm, onChangeStats
                   setIsMoveOpen(isMoveOpen.map((value, index) => (Number(index) === Number(i) ? false : value)))
                 }
               >
-                <MoveList id={i} gens={gens} onData={handleSeledtedMove} />
+                <MoveList id={i} gens={gens} onData={handleSeledtedMove} hidden={true} />
               </PopUp>
             </>
           );
