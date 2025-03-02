@@ -1,5 +1,5 @@
 import { calculate, Field, Move, Pokemon } from "@smogon/calc";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PokemonSelection from "@/components/PokemonSelection";
 import CalcMoveDamage from "@/components/CalcMoveDamage";
 
@@ -12,6 +12,7 @@ function DamageCalc({ gens }) {
 
   const [atkPkm, setAtkPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
+  const [resultDesc, setResultDesc] = useState("");
 
   const handleAttPkmChange = (name) => {
     setAtkPkm(new Pokemon(gen, name, { level: initLvl, ivs: initIVs, evs: initEVs }));
@@ -28,6 +29,22 @@ function DamageCalc({ gens }) {
   const handleDefPkmStatsChange = (pkm) => {
     setDefPkm(pkm.clone());
   };
+
+  const cmp = (a, b) => {
+    if (a.maxDamage < b.maxDamage) return 1;
+    if (a.maxDamage > b.maxDamage) return -1;
+    return 0;
+  };
+
+  function isEmpty(obj) {
+    for (const prop in obj) {
+      if (Object.hasOwn(obj, prop)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   const handlePkmLvlChange = (e) => {
     const lvl = Number(e.target.value);
@@ -71,58 +88,91 @@ function DamageCalc({ gens }) {
   //   terrain: 'Electric',
   // });
 
-  const damageRange = {
+  const damagePercentageRange = {
     0: { "No Move": "0% - 0%" },
     1: { "No Move": "0% - 0%" },
     2: { "No Move": "0% - 0%" },
     3: { "No Move": "0% - 0%" },
   };
+
+  const damageRange = {
+    0: [0, 0],
+    1: [0, 0],
+    2: [0, 0],
+    3: [0, 0],
+  };
+
+  const rawDescs = {
+    0: {},
+    1: {},
+    2: {},
+    3: {},
+  };
+
   atkPkm.moves.forEach((move, index) => {
     const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move)) : null;
-    // console.log(result);
-    damageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
+    console.log("result", result);
+    damagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
+    damageRange[index] = result ? [result.damage[0], result.damage[15]] : [0, 0];
+    rawDescs[index] = result?.rawDesc;
   });
-  console.log(Object.values(damageRange));
 
-  // const rawDesc = result.rawDesc;
-  // const attackBoost = (rawDesc.attackBoost ? (rawDesc.attackBoost > 0 ? `+${rawDesc.attackBoost}` : rawDesc.attackBoost) : '');
-  // const attackEVs = rawDesc.attackEVs;
-  // const attackItem = rawDesc.attackerItem || '';
-  // const atatckTera = rawDesc.attackerTera || '';
-  // const attackName = rawDesc.attackerName;
+  console.log("raw", rawDescs);
+  console.log("damage", damageRange);
 
-  // const defendBoost = (rawDesc.defenseBoost ? (rawDesc.defenseBoost > 0 ? `+${rawDesc.defenseBoost}` : rawDesc.defenseBoost) : '');
-  // const HPEVs = rawDesc.HPEVs;
-  // const defendEVs = rawDesc.defenseEVs;
-  // const defendItem = rawDesc.defenderItem || '';
-  // const defendTera = rawDesc.defenderTera || '';
-  // const defendName = rawDesc.defenderName;
+  const getResultDesc = (rawDescs) => {
+    const resultDescs = {};
+    Object.entries(rawDescs).map(([key, value]) => {
+      if (!isEmpty(value)) {
+        console.log("raw", value);
+        const attackBoost = value.attackBoost
+          ? value.attackBoost > 0
+            ? `+${value.attackBoost} `
+            : value.attackBoost + " "
+          : "";
+        const attackEVs = value.attackEVs;
+        const attackItem = value.attackerItem ? value.attackerItem + " " : "";
+        const atatckTera = value.attackerTera ? value.attackerTera + " " : "";
+        const attackName = value.attackerName;
 
-  // const conclusion = `${attackBoost} ${attackEVs} ${attackItem} ${atatckTera} ${attackName} VS. ${defendBoost} ${HPEVs} / ${defendEVs} ${defendItem} ${defendTera} ${defendName}`
+        const defendBoost = value.defenseBoost
+          ? value.defenseBoost > 0
+            ? `+${value.defenseBoost} `
+            : value.defenseBoost + " "
+          : "";
+        const HPEVs = value.HPEVs;
+        const defendEVs = value.defenseEVs;
+        const defendItem = value.defenderItem ? value.defenderItem + " " : "";
+        const defendTera = value.defenderTera ? value.defenderTera + " " : "";
+        const defendName = value.defenderName;
+        const minDamage = Object.values(damageRange[key])[0];
+        const maxDamage = Object.values(damageRange[key])[1];
 
-  // console.log(conclusion);
+        const conclusion = `${attackBoost}${attackEVs} ${attackItem}${atatckTera}${attackName} ${Object.keys(
+          damagePercentageRange[key],
+        )} VS. ${defendBoost}${HPEVs} / ${defendEVs} ${defendItem}${defendTera}${defendName}: ${minDamage}-${maxDamage} (${Object.values(
+          damagePercentageRange[key],
+        )})`;
+        resultDescs[key] = { conclusion: conclusion, maxDamage: maxDamage };
+        console.log(resultDescs);
+      }
+    });
+    return resultDescs;
+  };
+
+  const conclusion = getResultDesc(rawDescs);
 
   console.log(atkPkm, defPkm);
+
+  useEffect(() => {
+    if (!isEmpty(conclusion))
+      setResultDesc(Object.entries(conclusion).sort((a, b) => cmp(a[1], b[1]))[0][1]["conclusion"] || "");
+  }, [conclusion]);
 
   return (
     <div className="flex flex-col">
       <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
-      {/* <div className="w-full">
-        <div className="w-fit">
-          {Object.values(damageRange).map((damage) => {
-            return (<>
-              {Object.entries(damage).map(([move, range]) => {
-                return (
-                  <div className="flex m-2">
-                    <div className="w-35 p-1 bg-gray-300 rounded-xl text-center">{move}</div>
-                    <div className="pl-5 text-center my-auto">{range}</div>
-                  </div>
-                )
-              })}
-            </>)
-          })}
-        </div>
-      </div> */}
+      <div>{resultDesc}</div>
       <div className="flex justify-between p-10">
         <PokemonSelection
           gens={gens}
