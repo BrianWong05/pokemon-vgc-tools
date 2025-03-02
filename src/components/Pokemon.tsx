@@ -17,7 +17,12 @@ function Pokemon({ pkm, onData }) {
   return (
     <div className={`text-gray-200 flex py-5 w-150`} onClick={selectedPkm}>
       <div className="relative">
-        <div className="w-24 h-24 rounded-full bg-white absolute top-3 left-3" />
+        <div className="w-24 h-24 rounded-full bg-white absolute top-3 left-3">
+          <img
+            className="w-18 h-18 rounded-2xl bg-white absolute top-3 left-3"
+            src={`/pokemon-vgc-tools/images/pokemons/${pkm.name.replace(/\s+/g, "_")}_SV.png`}
+          />
+        </div>
         <div className="flex">
           <div className={`w-15 h-30 rounded-tl-full rounded-bl-full bg-${type1}`} />
           <div className={`w-15 h-30 rounded-tr-full rounded-br-full bg-${type2}`} />
