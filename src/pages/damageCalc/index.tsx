@@ -2,6 +2,7 @@ import { calculate, Field, Move, Pokemon } from "@smogon/calc";
 import { useEffect, useState } from "react";
 import PokemonSelection from "@/components/PokemonSelection";
 import CalcMoveDamage from "@/components/CalcMoveDamage";
+import Layout from "@/components/layout";
 
 function DamageCalc({ gens }) {
   const gen = gens.get(9);
@@ -176,39 +177,41 @@ function DamageCalc({ gens }) {
   }, [conclusion]);
 
   return (
-    <div className="flex flex-col">
-      <div className="mx-10">
-        <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
-        <div className="text-lg font-black mt-2 ml-2">
-          <div>{resultDesc}</div>
-          <div className="text-sm font-light">{possibleDamage && `Posible Damage amounts: (${possibleDamage})`}</div>
+    <Layout>
+      <div className="flex flex-col mt-5">
+        <div className="mx-10">
+          <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
+          <div className="text-lg font-black mt-2 ml-2">
+            <div>{resultDesc}</div>
+            <div className="text-sm font-light">{possibleDamage && `Posible Damage amounts: (${possibleDamage})`}</div>
+          </div>
+        </div>
+        <div className="flex justify-between p-10">
+          <PokemonSelection
+            gens={gens}
+            initPkm={initPkm}
+            battlepkm={atkPkm}
+            onChangePkm={handleAttPkmChange}
+            onChangeStats={handleAttPkmStatsChange}
+          />
+          <div className="flex gap-x-2">
+            <button value={50} onClick={handlePkmLvlChange}>
+              Level 50
+            </button>
+            <button value={100} onClick={handlePkmLvlChange}>
+              Level 100
+            </button>
+          </div>
+          <PokemonSelection
+            gens={gens}
+            initPkm={initPkm}
+            battlepkm={defPkm}
+            onChangePkm={handleDetPkmChange}
+            onChangeStats={handleDefPkmStatsChange}
+          />
         </div>
       </div>
-      <div className="flex justify-between p-10">
-        <PokemonSelection
-          gens={gens}
-          initPkm={initPkm}
-          battlepkm={atkPkm}
-          onChangePkm={handleAttPkmChange}
-          onChangeStats={handleAttPkmStatsChange}
-        />
-        <div className="flex gap-x-2">
-          <button value={50} onClick={handlePkmLvlChange}>
-            Level 50
-          </button>
-          <button value={100} onClick={handlePkmLvlChange}>
-            Level 100
-          </button>
-        </div>
-        <PokemonSelection
-          gens={gens}
-          initPkm={initPkm}
-          battlepkm={defPkm}
-          onChangePkm={handleDetPkmChange}
-          onChangeStats={handleDefPkmStatsChange}
-        />
-      </div>
-    </div>
+    </Layout>
   );
 }
 

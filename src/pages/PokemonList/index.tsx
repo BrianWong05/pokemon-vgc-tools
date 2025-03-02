@@ -1,8 +1,9 @@
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import Pokemon from "@/components/Pokemon";
+import Layout from "@/components/layout";
 
-function PokemonList({ gens, onData }) {
+function PokemonList({ gens, onData, hidden = false }) {
   // const gens = new Generations(Dex);
 
   const pkms = Array.from(gens.get(9).species);
@@ -21,13 +22,17 @@ function PokemonList({ gens, onData }) {
   // console.log(pkms[0]);
 
   return (
-    <div className="bg-[#24283B] scrollbar">
-      <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Pokemons</h2>
-      <SearchBar onSearch={handleSearch} placeholder="Pokémon" />
-      {searchResults.map((pkm) => {
-        return <Pokemon key={pkm.id} pkm={pkm} onData={onData} />;
-      })}
-    </div>
+    <Layout hidden={hidden}>
+      <div className="bg-[#24283B] scrollbar">
+        <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Pokemons</h2>
+        <SearchBar onSearch={handleSearch} placeholder="Pokémon" />
+        <div className="flex flex-wrap justify-evenly">
+          {searchResults.map((pkm) => {
+            return <Pokemon key={pkm.id} pkm={pkm} onData={onData} />;
+          })}
+        </div>
+      </div>
+    </Layout>
   );
 }
 

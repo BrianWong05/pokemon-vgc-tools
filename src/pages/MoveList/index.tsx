@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Move from "@/components/Move";
 import SearchBar from "@/components/SearchBar";
+import Layout from "@/components/layout";
 
-function MoveList({ gens, onData, id }) {
+function MoveList({ gens, onData, id, hidden = false }) {
   const moves = Array.from(gens.get(9).moves);
 
   const [searchResults, setSearchResults] = useState(moves);
@@ -17,16 +18,18 @@ function MoveList({ gens, onData, id }) {
   };
 
   return (
-    <div className="bg-[#24283B]">
-      <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Moves</h2>
-      <SearchBar onSearch={handleSearch} placeholder="Move" />
-      <div className="flex flex-wrap justify-center">
-        {searchResults.map((move) => {
-          return <Move key={move.num} move={move} onData={onData} id={id} />;
-        })}
-        ;
+    <Layout hidden={hidden}>
+      <div className="bg-[#24283B]">
+        <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Moves</h2>
+        <SearchBar onSearch={handleSearch} placeholder="Move" />
+        <div className="flex flex-wrap justify-center">
+          {searchResults.map((move) => {
+            return <Move key={move.num} move={move} onData={onData} id={id} />;
+          })}
+          ;
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
 
