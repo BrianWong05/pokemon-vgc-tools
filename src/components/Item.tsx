@@ -1,23 +1,22 @@
-function Item ({item, onData}) {
-  
+function Item({ item, onData }) {
   const name = item.name;
-
+  // const itemImg = import.meta.glob(`../assets/images/items/${name.replace(/\s+/g, "_")}_SV.png`);
+  const imagePath = `/pokemon-vgc-tools/images/items/${name.replace(/\s+/g, "_")}_SV.png`;
   const selectedItem = () => {
-    if(onData) {
-      onData(item)
+    if (onData) {
+      onData(item);
     }
-  }
+  };
 
   return (
     <div onClick={selectedItem}>
       <div className={`text-gray-200 flex w-xl`}>
-        <div className="text-2xl my-auto">
-          {name}
-        </div>
+        <img src={imagePath} />
+        <div className="text-2xl my-auto">{name}</div>
       </div>
       <hr className="w-xl border-gray-700" />
     </div>
-  )
+  );
 }
 
-export default Item
+export default Item;
