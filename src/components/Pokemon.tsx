@@ -21,6 +21,7 @@ function Pokemon({ pkm, onData }) {
           <img
             className="w-18 h-18 rounded-2xl bg-white absolute top-3 left-3"
             src={`/pokemon-vgc-tools/images/pokemons/${pkm.name.replace(/\s+/g, "_")}_SV.png`}
+            loading="lazy"
           />
         </div>
         <div className="flex">
