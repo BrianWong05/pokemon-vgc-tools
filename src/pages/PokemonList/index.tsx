@@ -10,11 +10,15 @@ function PokemonList({ gens, onData }) {
   const [searchResults, setSearchResults] = useState(pkms);
 
   const handleSearch = (query: string) => {
-    const filteredResults = pkms.filter((pkm) => pkm.name.toLowerCase().includes(query.toLowerCase()));
+    const filteredResults = pkms.filter(
+      (pkm) =>
+        pkm.name.toLowerCase().includes(query.toLowerCase()) ||
+        pkm.types.some((type) => type.toLowerCase().includes(query.toLowerCase())),
+    );
     setSearchResults(filteredResults);
   };
 
-  // console.log(pkms[0])
+  // console.log(pkms[0]);
 
   return (
     <div className="bg-[#24283B] scrollbar">

@@ -8,7 +8,11 @@ function MoveList({ gens, onData, id }) {
   const [searchResults, setSearchResults] = useState(moves);
 
   const handleSearch = (query: string) => {
-    const filteredResults = moves.filter((move) => move.name.toLowerCase().includes(query.toLowerCase()));
+    const filteredResults = moves.filter(
+      (move) =>
+        move.name.toLowerCase().includes(query.toLowerCase()) ||
+        move.type.toLocaleLowerCase().includes(query.toLowerCase()),
+    );
     setSearchResults(filteredResults);
   };
 
