@@ -177,7 +177,7 @@ function DamageCalc({ gens }) {
   }, [conclusion]);
 
   return (
-    <Layout>
+    <Layout fixed={false}>
       <div className="flex flex-col mt-5">
         <div className="mx-10">
           <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
