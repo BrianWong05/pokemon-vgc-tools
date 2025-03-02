@@ -23,9 +23,11 @@ function PokemonList({ gens, onData, hidden = false }) {
 
   return (
     <Layout hidden={hidden}>
-      <div className="bg-[#24283B] scrollbar">
-        <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Pokemons</h2>
-        <SearchBar onSearch={handleSearch} placeholder="Pokémon" />
+      <div className="bg-[#24283B] scrollbar w-full">
+        <div className="sticky -top-8 bg-[#24283B] pb-7 z-10">
+          <div className="text-3xl text-center text-gray-200 h-25 pt-10">Pokemons</div>
+          <SearchBar onSearch={handleSearch} placeholder="Pokémon" />
+        </div>
         <div className="flex flex-wrap justify-evenly">
           {searchResults.map((pkm) => {
             return <Pokemon key={pkm.id} pkm={pkm} onData={onData} />;

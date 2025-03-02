@@ -19,9 +19,11 @@ function MoveList({ gens, onData, id, hidden = false }) {
 
   return (
     <Layout hidden={hidden}>
-      <div className="bg-[#24283B]">
-        <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Moves</h2>
-        <SearchBar onSearch={handleSearch} placeholder="Move" />
+      <div className="bg-[#24283B] h-full">
+        <div className="sticky -top-8 bg-[#24283B] pb-7 z-10">
+          <div className="text-3xl text-center text-gray-200 h-25 pt-8">Moves</div>
+          <SearchBar onSearch={handleSearch} placeholder="Move" />
+        </div>
         <div className="flex flex-wrap justify-center">
           {searchResults.map((move) => {
             return <Move key={move.num} move={move} onData={onData} id={id} />;

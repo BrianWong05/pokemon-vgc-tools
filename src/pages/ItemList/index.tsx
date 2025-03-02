@@ -16,8 +16,10 @@ function ItemList({ gens, onData, hidden = false }) {
   return (
     <Layout hidden={hidden}>
       <div className="bg-[#24283B]">
-        <h2 className="text-3xl text-center text-gray-200 h-25 pt-10">Items</h2>
-        <SearchBar onSearch={handleSearch} placeholder="Item" />
+        <div className="sticky -top-8 bg-[#24283B] pb-7 z-10">
+          <div className="text-3xl text-center text-gray-200 h-25 pt-10">Items</div>
+          <SearchBar onSearch={handleSearch} placeholder="Item" />
+        </div>
         <div className="flex flex-wrap justify-center">
           {searchResults.map((item) => {
             return <Item key={item.num} item={item} onData={onData} />;
