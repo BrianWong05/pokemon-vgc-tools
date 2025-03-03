@@ -1,4 +1,5 @@
 import { icons } from "@/assets/icons";
+import TypeTag from "@/components/TypeTag";
 
 function Pokemon({ pkm, onData }) {
   const selectedPkm = () => {
@@ -37,20 +38,8 @@ function Pokemon({ pkm, onData }) {
             <div className="font-black my-auto">{pkm.name}</div>
           </div>
           <div className="flex gap-1">
-            <div className={`flex h-6 w-22 bg-${type1} rounded-4xl `}>
-              <div className={`flex mx-auto`}>
-                <img src={icons[type1]} className="h-5 my-auto" />
-                <div className="my-auto">{type1}</div>
-              </div>
-            </div>
-            {type1 !== type2 && (
-              <div className={`flex h-6 w-22 bg-${type2} rounded-4xl `}>
-                <div className={`flex mx-auto`}>
-                  <img src={icons[type2]} className="h-5 my-auto" />
-                  <div className="my-auto">{type2}</div>
-                </div>
-              </div>
-            )}
+            <TypeTag type={type1} />
+            {type1 !== type2 && <TypeTag type={type2} />}
           </div>
         </div>
         <div className="flex">
