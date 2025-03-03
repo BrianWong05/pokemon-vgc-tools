@@ -15,7 +15,7 @@ function Pokemon({ pkm, onData }) {
   const Stat = { hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "SpD", spe: "Spe" };
 
   return (
-    <div className={`text-gray-200 flex py-5 w-150`} onClick={selectedPkm}>
+    <div className={`text-gray-200 flex py-5 w-150 cursor-pointer`} onClick={selectedPkm}>
       <div className="relative">
         <div className="w-24 h-24 rounded-full bg-white absolute top-3 left-3">
           <img

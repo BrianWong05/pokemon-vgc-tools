@@ -44,7 +44,7 @@ function Move({ move, onData, id }) {
 
   return (
     <>
-      <div onClick={selectedMove}>
+      <div className="cursor-pointer" onClick={selectedMove}>
         <div className={`text-gray-200 flex w-xl`}>
           <div className="block pl-5 py-5 justify-between w-full">
             <div className="flex justify-between">
