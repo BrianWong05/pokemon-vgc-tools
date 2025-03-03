@@ -1,7 +1,12 @@
 import Layout from "@/components/layout";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/damagecalc");
+  }, []);
   return (
     <Layout>
       <div>Home</div>
