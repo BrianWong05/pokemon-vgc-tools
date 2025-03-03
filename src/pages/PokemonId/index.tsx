@@ -1,5 +1,7 @@
 import Layout from "@/components/layout";
+import TypeDefense from "@/components/TypeDefense";
 import TypeTag from "@/components/TypeTag";
+import { TYPE_CHART } from "@smogon/calc";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -31,6 +33,37 @@ function PokemonId({ gens }) {
   const types = pkm.types;
   const type1 = types[0].toLocaleLowerCase();
   const type2 = types[types.length - 1].toLocaleLowerCase();
+  const typeChart = TYPE_CHART[9];
+
+  console.log(typeChart);
+  const capitalizeFirstLetter = (val) => {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+  };
+
+  const calcTypeDefence = (type1, type2 = "???") => {
+    const typeDefense = {};
+    Object.entries(typeChart).map(([key, value]) => {
+      if (key !== "???" && key !== "Stellar") {
+        typeDefense[key.toLocaleLowerCase()] =
+          value[capitalizeFirstLetter(type1.toLocaleLowerCase())] *
+          value[capitalizeFirstLetter(type2.toLocaleLowerCase())];
+      }
+    });
+
+    console.log(typeDefense);
+    console.log(Object.values(typeDefense).includes(4));
+    console.log(Object.values(typeDefense).includes(2));
+    console.log(Object.values(typeDefense).includes(0.5));
+    console.log(Object.values(typeDefense).includes(0.25));
+    console.log(Object.values(typeDefense).includes(0));
+    console.log(Object.values(typeDefense).includes(1));
+
+    return typeDefense;
+  };
+
+  const typeDefense = calcTypeDefence(type1, type1 === type2 ? "???" : type2);
+
+  console.log(Object.keys(typeDefense).filter((key) => typeDefense[key] === 1));
 
   console.log(pkm.num, pkm, baseStats);
   return (
@@ -73,6 +106,14 @@ function PokemonId({ gens }) {
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex flex-col mt-6">
+          <TypeDefense typeDefense={typeDefense} times={4} />
+          <TypeDefense typeDefense={typeDefense} times={2} />
+          <TypeDefense typeDefense={typeDefense} times={0.5} />
+          <TypeDefense typeDefense={typeDefense} times={0.25} />
+          <TypeDefense typeDefense={typeDefense} times={0} />
+          <TypeDefense typeDefense={typeDefense} times={1} />
         </div>
       </div>
     </Layout>
