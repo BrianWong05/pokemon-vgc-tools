@@ -1,12 +1,13 @@
 import { createHashRouter } from "react-router-dom";
-import Error from "./pages/error";
-import Home from "./pages/home";
+import Error from "@/pages/error";
+import Home from "@/pages/home";
 import { Generations } from "@pkmn/data";
 import { Dex } from "@pkmn/dex";
 import DamageCalc from "@/pages/damageCalc";
 import PokemonList from "@/pages/PokemonList";
 import MoveList from "@/pages/MoveList";
 import ItemList from "@/pages/ItemList";
+import PokemonId from "@/pages/PokemonId";
 
 const gens = new Generations(Dex);
 
@@ -18,7 +19,12 @@ export const router = createHashRouter([
   },
   {
     path: "/pokemons",
-    element: <PokemonList gens={gens} onData={() => {}} />,
+    element: <PokemonList gens={gens} />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/pokemons/:id",
+    element: <PokemonId gens={gens} />,
     errorElement: <Error />,
   },
   {

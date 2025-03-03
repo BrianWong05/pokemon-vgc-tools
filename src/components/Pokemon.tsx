@@ -1,10 +1,13 @@
-import { icons } from "@/assets/icons";
 import TypeTag from "@/components/TypeTag";
+import { useNavigate } from "react-router-dom";
 
 function Pokemon({ pkm, onData }) {
+  const navigate = useNavigate();
   const selectedPkm = () => {
     if (onData) {
       onData(pkm);
+    } else {
+      navigate(`/pokemons/${pkm.name}`);
     }
   };
 
