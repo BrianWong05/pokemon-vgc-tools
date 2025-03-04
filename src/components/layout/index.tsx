@@ -1,21 +1,41 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router-dom";
 
 function Layout({ children, hidden = false, fixed = true }) {
+  const location = useLocation();
+  const { hash, pathname, search } = location;
+  console.log(hash, pathname, search);
   return (
     <>
-      <div className={`h-15 w-full flex text-xl bg-[#24283B] text-gray-200 z-50 ${hidden && "hidden"}`}>
-        <div className={`h-15 flex justify-evenly w-full bg-[#24283B] z-50 ${fixed && "fixed"}`}>
-          <Link to={"/damagecalc"} className="my-auto">
-            <button>Damage calculator</button>
+      <div className={`h-15 w-full flex justify-center text-xl bg-[#24283B] text-gray-200 z-50 ${hidden && "hidden"}`}>
+        <div
+          className={`flex w-fit py-2 px-5 rounded-full gap-0.5 border border-[#333c6715] bg-[#333c6750] backdrop-blur z-50 ${
+            fixed && "fixed"
+          }`}
+        >
+          {/* <nav className="flex gap-1 p-0.5 border border-primary/15 rounded-full bg-primary/10 backdrop-blur"></nav> */}
+          <Link
+            to={"/damagecalc"}
+            className={`my-auto nav-item ${pathname.toLowerCase().includes("/damagecalc") && "bg-[#4e60b1]"}`}
+          >
+            <button className="cursor-pointer">Damage calculator</button>
           </Link>
-          <Link to={"/pokemons"} className="my-auto">
-            <button>Pokemons</button>
+          <Link
+            to={"/pokemons"}
+            className={`my-auto nav-item ${pathname.toLowerCase().includes("/pokemons") && "bg-[#4e60b1]"}`}
+          >
+            <button className="cursor-pointer">Pokemons</button>
           </Link>
-          <Link to={"/moves"} className="my-auto">
-            <button>Moves</button>
+          <Link
+            to={"/moves"}
+            className={`my-auto nav-item ${pathname.toLowerCase().includes("/moves") && "bg-[#4e60b1]"}`}
+          >
+            <button className="cursor-pointer">Moves</button>
           </Link>
-          <Link to={"/items"} className="my-auto">
-            <button>Items</button>
+          <Link
+            to={"/items"}
+            className={`my-auto nav-item ${pathname.toLowerCase().includes("/items") && "bg-[#4e60b1]"}`}
+          >
+            <button className="cursor-pointer">Items</button>
           </Link>
         </div>
       </div>
