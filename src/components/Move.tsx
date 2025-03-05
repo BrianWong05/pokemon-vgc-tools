@@ -44,8 +44,8 @@ function Move({ move, onData, id }) {
 
   return (
     <>
-      <div className="cursor-pointer" onClick={selectedMove}>
-        <div className={`text-gray-200 flex w-xl`}>
+      <div className="cursor-pointer w-fit" onClick={selectedMove}>
+        <div className={`text-gray-200 flex w-screen sm:w-xl px-2 sm:px-0`}>
           <div className="block pl-5 py-5 justify-between w-full">
             <div className="flex justify-between">
               <img src={categoryIcon} className="h-9" />
@@ -84,7 +84,7 @@ function Move({ move, onData, id }) {
             </div>
           </div>
         </div>
-        <hr className="w-xl border-gray-700" />
+        <hr className="w-full sm:w-xl border-gray-700" />
       </div>
     </>
   );

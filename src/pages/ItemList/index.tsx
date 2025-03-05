@@ -15,8 +15,8 @@ function ItemList({ gens, onData, hidden = false }) {
 
   return (
     <Layout hidden={hidden}>
-      <div className="bg-[#24283B]">
-        <div className="sticky -top-8 bg-[#24283B] pb-7 z-10">
+      <div className="bg-[#24283B] pt-15">
+        <div className="sticky -top-2 bg-[#24283B50] pb-7 z-10 backdrop-blur-xs">
           <div className="text-3xl text-center text-gray-200 h-25 pt-10">Items</div>
           <SearchBar onSearch={handleSearch} placeholder="Item" />
         </div>
