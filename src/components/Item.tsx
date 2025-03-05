@@ -9,8 +9,8 @@ function Item({ item, onData }) {
   };
 
   return (
-    <div className="cursor-pointer w-fit" onClick={selectedItem}>
-      <div className={`text-gray-200 flex w-screen sm:w-xl h-20`}>
+    <div className="cursor-pointer w-screen sm:w-xl " onClick={selectedItem}>
+      <div className={`text-gray-200 flex h-20`}>
         <div className="h-20 w-30 flex">
           <img src={imagePath} className="max-h-20 px-2 m-auto" loading="lazy" />
         </div>
