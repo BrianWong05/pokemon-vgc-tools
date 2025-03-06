@@ -17,6 +17,8 @@ import rockIcon from "@/assets/images/icons/rock.svg";
 import steelIcon from "@/assets/images/icons/steel.svg";
 import waterIcon from "@/assets/images/icons/water.svg";
 
+// type Type = 'bug' |'dark' |'dragon' |'electric' |'fairy' |'fighting' |'fire' |'flying' |'ghost' |'grass' |'ground' |'ice' |'normal' |'poison' |'psychic' |'rock' |'steel' |'water'
+
 // export all icons
 export const icons = {
   bug: bugIcon,

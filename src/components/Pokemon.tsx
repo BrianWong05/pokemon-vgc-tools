@@ -1,7 +1,14 @@
 import TypeTag from "@/components/TypeTag";
+import { Specie } from "@pkmn/data";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function Pokemon({ pkm, onData }) {
+interface IPokemonProps {
+  pkm: Specie;
+  onData?: (pkm: Specie) => void;
+}
+
+const Pokemon: React.FunctionComponent<IPokemonProps> = ({ pkm, onData }) => {
   const navigate = useNavigate();
   const selectedPkm = () => {
     if (onData) {
@@ -51,7 +58,7 @@ function Pokemon({ pkm, onData }) {
               return (
                 <div className="flex flex-col w-10 text-center my-auto">
                   <p className="text-xl">{value}</p>
-                  <p className="text-xs">{Stat[stat]}</p>
+                  <p className="text-xs">{Stat[stat as keyof typeof Stat]}</p>
                 </div>
               );
             })}
@@ -60,6 +67,6 @@ function Pokemon({ pkm, onData }) {
       </div>
     </div>
   );
-}
+};
 
 export default Pokemon;

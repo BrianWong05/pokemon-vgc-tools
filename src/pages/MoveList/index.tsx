@@ -1,9 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Move from "@/components/Move";
 import SearchBar from "@/components/SearchBar";
 import Layout from "@/components/layout";
+import { Generations, MoveData } from "@pkmn/data";
+interface IMoveListProps {
+  gens: Generations;
+  onData?: (move: MoveData, id: string | number) => void;
+  id?: string | number;
+  hidden?: boolean;
+}
 
-function MoveList({ gens, onData, id, hidden = false }) {
+const MoveList: React.FunctionComponent<IMoveListProps> = ({ gens, onData, id, hidden = false }) => {
   const moves = Array.from(gens.get(9).moves);
 
   const [searchResults, setSearchResults] = useState(moves);
@@ -26,13 +33,12 @@ function MoveList({ gens, onData, id, hidden = false }) {
         </div>
         <div className="flex flex-wrap justify-center">
           {searchResults.map((move) => {
-            return <Move key={move.num} move={move} onData={onData} id={id} />;
+            return <Move key={move.name} move={move} onData={onData} id={id ?? ""} />;
           })}
-          ;
         </div>
       </div>
     </Layout>
   );
-}
+};
 
 export default MoveList;

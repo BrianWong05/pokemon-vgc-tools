@@ -1,17 +1,22 @@
 import Layout from "@/components/layout";
 import TypeDefense from "@/components/TypeDefense";
 import TypeTag from "@/components/TypeTag";
+import { Generations, Specie } from "@pkmn/data";
 import { TYPE_CHART } from "@smogon/calc";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-function PokemonId({ gens }) {
+interface IPokemonIdProps {
+  gens: Generations;
+}
+
+const PokemonId: React.FunctionComponent<IPokemonIdProps> = ({ gens }) => {
   const param = useParams();
   const id = param.id;
   const navigate = useNavigate();
 
   const pkms = Array.from(gens.get(9).species);
-  const [pkm, setPkm] = useState(null);
+  const [pkm, setPkm] = useState<Specie>();
   const Stat = { hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "SpD", spe: "Spe" };
 
   useEffect(() => {
@@ -20,7 +25,7 @@ function PokemonId({ gens }) {
     );
     if (selectedPkm.length !== 1) navigate("/pokemons");
     else setPkm(selectedPkm[0]);
-  }, [id]);
+  }, [id, navigate, pkms]);
 
   if (!pkm)
     return (
@@ -33,15 +38,15 @@ function PokemonId({ gens }) {
   const types = pkm.types;
   const type1 = types[0].toLocaleLowerCase();
   const type2 = types[types.length - 1].toLocaleLowerCase();
-  const typeChart = TYPE_CHART[9];
+  const typeChart: { [key: string]: { [key: string]: number } } = TYPE_CHART[9];
 
   console.log(typeChart);
-  const capitalizeFirstLetter = (val) => {
+  const capitalizeFirstLetter = (val: string) => {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
   };
 
-  const calcTypeDefence = (type1, type2 = "???") => {
-    const typeDefense = {};
+  const calcTypeDefence = (type1: string, type2: string = "???") => {
+    const typeDefense: { [key: string]: number } = {};
     Object.entries(typeChart).map(([key, value]) => {
       if (key !== "???" && key !== "Stellar") {
         typeDefense[key.toLocaleLowerCase()] =
@@ -49,14 +54,6 @@ function PokemonId({ gens }) {
           value[capitalizeFirstLetter(type2.toLocaleLowerCase())];
       }
     });
-
-    console.log(typeDefense);
-    console.log(Object.values(typeDefense).includes(4));
-    console.log(Object.values(typeDefense).includes(2));
-    console.log(Object.values(typeDefense).includes(0.5));
-    console.log(Object.values(typeDefense).includes(0.25));
-    console.log(Object.values(typeDefense).includes(0));
-    console.log(Object.values(typeDefense).includes(1));
 
     return typeDefense;
   };
@@ -89,7 +86,7 @@ function PokemonId({ gens }) {
                 return (
                   <div className="flex flex-col w-10 text-center my-auto font-black">
                     <p className="text-xl">{value}</p>
-                    <p className="text-xs">{Stat[stat]}</p>
+                    <p className="text-xs">{Stat[stat as keyof typeof Stat]}</p>
                   </div>
                 );
               })}
@@ -118,6 +115,6 @@ function PokemonId({ gens }) {
       </div>
     </Layout>
   );
-}
+};
 
 export default PokemonId;

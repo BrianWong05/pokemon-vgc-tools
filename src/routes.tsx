@@ -29,7 +29,7 @@ export const router = createHashRouter([
   },
   {
     path: "/moves",
-    element: <MoveList gens={gens} onData={() => {}} />,
+    element: <MoveList gens={gens} />,
     errorElement: <Error />,
   },
   {

@@ -1,4 +1,12 @@
-function PopUp ({isOpen, onClose, children}) {
+import React from "react";
+
+interface IPopUpProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+const PopUp: React.FunctionComponent<IPopUpProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
@@ -6,15 +14,12 @@ function PopUp ({isOpen, onClose, children}) {
       <div className="absolute inset-0 bg-black opacity-75" onClick={onClose}></div>
       <div className="relative max-w-2xl p-0 bg-white rounded shadow-lg max-h-[calc(90vh)] overflow-auto">
         {children}
-        <button
-          className="mt-4 px-3 py-1 text-sm text-red-600 hover:text-red-800"
-          onClick={onClose}
-        >
+        <button className="mt-4 px-3 py-1 text-sm text-red-600 hover:text-red-800" onClick={onClose}>
           Close
         </button>
       </div>
     </div>
   );
-}
+};
 
-export default PopUp
+export default PopUp;

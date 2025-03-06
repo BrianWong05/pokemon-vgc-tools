@@ -1,9 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-function SearchBar({ onSearch, placeholder }) {
+interface ISearchBarProps {
+  onSearch(value: string): void;
+  placeholder: string;
+}
+
+const SearchBar: React.FunctionComponent<ISearchBarProps> = ({ onSearch, placeholder }) => {
   const [query, setQuery] = useState("");
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
     onSearch(value); // real time search
@@ -20,6 +25,6 @@ function SearchBar({ onSearch, placeholder }) {
       />
     </div>
   );
-}
+};
 
 export default SearchBar;

@@ -1,12 +1,17 @@
-import { calculate, Field, Move, Pokemon } from "@smogon/calc";
-import { useEffect, useState } from "react";
+import { calculate, Field, Move, Pokemon, Result } from "@smogon/calc";
+import React, { useEffect, useState } from "react";
 import PokemonSelection from "@/components/PokemonSelection";
 import CalcMoveDamage from "@/components/CalcMoveDamage";
 import Layout from "@/components/layout";
+import { Generations, Specie } from "@pkmn/data";
 
-function DamageCalc({ gens }) {
+interface IDamageCalcProps {
+  gens: Generations;
+}
+
+const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
   const gen = gens.get(9);
-  const initPkm = Array.from(gen.species)[0];
+  const initPkm = Array.from(gen.species)[0] as Specie;
   const initIVs = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
   const initEVs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
   const initLvl = 50;
@@ -16,31 +21,40 @@ function DamageCalc({ gens }) {
   const [resultDesc, setResultDesc] = useState("");
   const [possibleDamage, setPossibleDamage] = useState("");
 
-  const handleAttPkmChange = (name) => {
+  const handleAttPkmChange = (name: string) => {
     setAtkPkm(new Pokemon(gen, name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   };
 
-  const handleAttPkmStatsChange = (pkm) => {
+  const handleAttPkmStatsChange = (pkm: Pokemon) => {
     setAtkPkm(pkm.clone());
   };
 
-  const handleDetPkmChange = (name) => {
+  const handleDetPkmChange = (name: string) => {
     setDefPkm(new Pokemon(gen, name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   };
 
-  const handleDefPkmStatsChange = (pkm) => {
+  const handleDefPkmStatsChange = (pkm: Pokemon) => {
     setDefPkm(pkm.clone());
   };
 
-  const cmp = (a, b) => {
+  const cmp = (
+    a: {
+      conclusion: string;
+      damageRange: number[];
+    },
+    b: {
+      conclusion: string;
+      damageRange: number[];
+    },
+  ) => {
     if (a.damageRange[15] < b.damageRange[15]) return 1;
     if (a.damageRange[15] > b.damageRange[15]) return -1;
     return 0;
   };
 
-  function isEmpty(obj) {
+  function isEmpty(obj: object) {
     for (const prop in obj) {
-      if (Object.hasOwn(obj, prop)) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         return false;
       }
     }
@@ -48,8 +62,8 @@ function DamageCalc({ gens }) {
     return true;
   }
 
-  const handlePkmLvlChange = (e) => {
-    const lvl = Number(e.target.value);
+  const handlePkmLvlChange = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const lvl = Number(e.currentTarget.value);
     const pkm = [atkPkm.clone(), defPkm.clone()];
     console.log(lvl);
     pkm[0].level = lvl;
@@ -58,9 +72,9 @@ function DamageCalc({ gens }) {
     setDefPkm(pkm[1].clone());
   };
 
-  const calcDamageRange = (result) => {
+  const calcDamageRange = (result: Result) => {
     const move = result.move.name;
-    const damages = result.damage;
+    const damages = result.damage as number[];
     const defendPkm = result.defender;
 
     const drain = result.move.drain ? result.move.drain : null;
@@ -86,47 +100,59 @@ function DamageCalc({ gens }) {
 
   // const move = new Move(gen, 'pound');
   // const field = new Field({
-  //   weather: 'Rain',
-  //   terrain: 'Electric',
+  //       weather: "";
+  //       terrain?: Terrain;
+  //       isMagicRoom: boolean;
+  //       isWonderRoom: boolean;
+  //       isGravity: boolean;
+  //       isAuraBreak?: boolean;
+  //       isFairyAura?: boolean;
+  //       isDarkAura?: boolean;
+  //       isBeadsOfRuin?: boolean;
+  //       isSwordOfRuin?: boolean;
+  //       isTabletsOfRuin?: boolean;
+  //       isVesselOfRuin?: boolean;
   // });
 
-  const damagePercentageRange = {
+  const damagePercentageRange: { [key: number]: { [move: string]: string } } = {
     0: { "No Move": "0% - 0%" },
     1: { "No Move": "0% - 0%" },
     2: { "No Move": "0% - 0%" },
     3: { "No Move": "0% - 0%" },
   };
 
-  const damageRange = {
-    0: [0, 0],
-    1: [0, 0],
-    2: [0, 0],
-    3: [0, 0],
-  };
+  const damageRange: number[][] = [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ];
 
-  const rawDescs = {
+  const rawDescs: { [key: number]: unknown | null } = {
     0: {},
     1: {},
     2: {},
     3: {},
   };
 
+  console.log("Result");
+
   atkPkm.moves.forEach((move, index) => {
     const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move)) : null;
     // console.log("result", result);
     damagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
-    damageRange[index] = result ? result.damage : [0, 0];
+    damageRange[index] = Array.isArray(result?.damage) ? (result.damage as number[]) : [0, 0];
     rawDescs[index] = result?.rawDesc;
   });
 
   // console.log("raw", rawDescs);
   // console.log("damage", damageRange);
 
-  const getResultDesc = (rawDescs) => {
-    const resultDescs = {};
+  const getResultDesc = (rawDescs: { [key: number]: object }) => {
+    const resultDescs: { [key: string]: { conclusion: string; damageRange: number[] } } = {};
     Object.entries(rawDescs).map(([key, value]) => {
       if (!isEmpty(value)) {
-        console.log("raw", value);
+        console.log("raw", value, Result["rawDesc"]);
         const attackBoost = value.attackBoost
           ? value.attackBoost > 0
             ? `+${value.attackBoost} `
@@ -147,15 +173,18 @@ function DamageCalc({ gens }) {
         const defendItem = value.defenderItem ? value.defenderItem + " " : "";
         const defendTera = value.defenderTera ? value.defenderTera + " " : "";
         const defendName = value.defenderName;
-        const minDamage = Object.values(damageRange[key])[0];
-        const maxDamage = Object.values(damageRange[key])[15];
+        const minDamage = Object.values(damageRange[key as keyof typeof damageRange])[0];
+        const maxDamage = Object.values(damageRange[key as keyof typeof damageRange])[15];
 
         const conclusion = `${attackBoost}${attackEVs} ${attackItem}${atatckTera}${attackName} ${Object.keys(
-          damagePercentageRange[key],
+          damagePercentageRange[Number(key)],
         )} VS. ${defendBoost}${HPEVs} / ${defendEVs} ${defendItem}${defendTera}${defendName}: ${minDamage}-${maxDamage} (${Object.values(
-          damagePercentageRange[key],
+          damagePercentageRange[Number(key)],
         )})`;
-        resultDescs[key] = { conclusion: conclusion, damageRange: damageRange[key] };
+        resultDescs[key] = {
+          conclusion: conclusion,
+          damageRange: damageRange[key as keyof typeof damageRange] as number[],
+        };
         console.log(resultDescs);
       }
     });
@@ -170,9 +199,9 @@ function DamageCalc({ gens }) {
   useEffect(() => {
     if (!isEmpty(conclusion)) {
       const key = Object.entries(conclusion).sort((a, b) => cmp(a[1], b[1]))[0][0];
-      console.log("last one", key, conclusion[key]["damageRange"]);
-      setResultDesc(conclusion[key]["conclusion"] || "");
-      setPossibleDamage(conclusion[key]["damageRange"].toString());
+      console.log("last one", key, conclusion[key as keyof typeof conclusion]["damageRange"]);
+      setResultDesc(conclusion[key as keyof typeof conclusion]["conclusion"] || "");
+      setPossibleDamage((conclusion[key as keyof typeof conclusion]["damageRange"] as number[]).toString());
     }
   }, [conclusion]);
 
@@ -213,6 +242,6 @@ function DamageCalc({ gens }) {
       </div>
     </Layout>
   );
-}
+};
 
 export default DamageCalc;

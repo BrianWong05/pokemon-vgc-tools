@@ -1,9 +1,17 @@
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-function Layout({ children, hidden = false, fixed = true }) {
+interface ILayoutProps {
+  children: React.ReactNode;
+  hidden?: boolean;
+  fixed?: boolean;
+}
+
+const Layout: React.FunctionComponent<ILayoutProps> = ({ children, hidden = false, fixed = true }) => {
   const location = useLocation();
-  const { hash, pathname, search } = location;
-  console.log(hash, pathname, search);
+  const pathname = location.pathname;
+
+  // console.log(hash, pathname, search);
   return (
     <>
       <div
@@ -45,6 +53,6 @@ function Layout({ children, hidden = false, fixed = true }) {
       <div className={``}>{children}</div>
     </>
   );
-}
+};
 
 export default Layout;

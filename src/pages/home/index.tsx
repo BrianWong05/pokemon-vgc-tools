@@ -6,7 +6,7 @@ function Home() {
   const navigate = useNavigate();
   useEffect(() => {
     navigate("/damagecalc");
-  }, []);
+  }, [navigate]);
   return (
     <Layout>
       <div>Home</div>

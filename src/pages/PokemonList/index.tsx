@@ -1,9 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import Pokemon from "@/components/Pokemon";
 import Layout from "@/components/layout";
+import { Generations, Specie } from "@pkmn/data";
 
-function PokemonList({ gens, onData, hidden = false }) {
+interface IPokemonListProps {
+  gens: Generations;
+  onData?: (pkm: Specie) => void;
+  hidden?: boolean;
+}
+
+const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData, hidden = false }) => {
   // const gens = new Generations(Dex);
 
   const pkms = Array.from(gens.get(9).species);
@@ -36,6 +43,6 @@ function PokemonList({ gens, onData, hidden = false }) {
       </div>
     </Layout>
   );
-}
+};
 
 export default PokemonList;

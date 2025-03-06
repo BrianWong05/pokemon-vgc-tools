@@ -1,9 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Item from "@/components/Item";
 import SearchBar from "@/components/SearchBar";
 import Layout from "@/components/layout";
+import { Generations, Item as PkmItem } from "@pkmn/data";
 
-function ItemList({ gens, onData, hidden = false }) {
+interface IItemListProps {
+  gens: Generations;
+  onData?: (item: PkmItem) => void;
+  hidden?: boolean;
+}
+
+const ItemList: React.FunctionComponent<IItemListProps> = ({ gens, onData, hidden = false }) => {
   const items = Array.from(gens.get(9).items);
 
   const [searchResults, setSearchResults] = useState(items);
@@ -28,6 +35,6 @@ function ItemList({ gens, onData, hidden = false }) {
       </div>
     </Layout>
   );
-}
+};
 
 export default ItemList;

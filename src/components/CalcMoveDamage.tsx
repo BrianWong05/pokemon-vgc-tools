@@ -1,11 +1,20 @@
-import { calculate, Field, Move, Pokemon } from "@smogon/calc";
+import { calculate, Move, Pokemon, Result } from "@smogon/calc";
+import React from "react";
+import { Generation, Generations } from "@pkmn/data";
 
-function CalcMoveDamage({ gens, atkPkm, defPkm }) {
+interface ICalcMoveDamageProps {
+  gens: typeof Generations.prototype;
+  atkPkm: typeof Pokemon.prototype;
+  defPkm: typeof Pokemon.prototype;
+}
+
+const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ gens, atkPkm, defPkm }) => {
   const gen = gens.get(9);
+  console.log("gen", gen);
 
-  const calcDamageRange = (result) => {
+  const calcDamageRange = (result: typeof Result.prototype) => {
     const move = result.move.name;
-    const damages = result.damage;
+    const damages = result.damage as number[];
     const defendPkm = result.defender;
 
     const drain = result.move.drain ? result.move.drain : null;
@@ -29,8 +38,8 @@ function CalcMoveDamage({ gens, atkPkm, defPkm }) {
     return returnObj;
   };
 
-  const pkmMoveDamage = (atkPkm, defPkm, gen) => {
-    const damageRange = {
+  const pkmMoveDamage = (atkPkm: Pokemon, defPkm: Pokemon, gen: Generation) => {
+    const damageRange: { [key: number]: { [move: string]: string } } = {
       0: { "No Move": "0% - 0%" },
       1: { "No Move": "0% - 0%" },
       2: { "No Move": "0% - 0%" },
@@ -49,41 +58,41 @@ function CalcMoveDamage({ gens, atkPkm, defPkm }) {
 
   return (
     <div className="w-full flex justify-between">
-      <div className="w-1/2">
-        {Object.values(atkPkmDamageRange).map((damage) => {
+      <div className="w-full sm:w-1/2">
+        {Object.values(atkPkmDamageRange).map((damage, index) => {
           return (
-            <>
+            <div key={index}>
               {Object.entries(damage).map(([move, range]) => {
                 return (
-                  <div className="flex m-2">
+                  <div className="flex m-2" key={move}>
                     <div className="w-35 p-1 bg-gray-300 rounded-xl text-center">{move}</div>
                     <div className="pl-5 text-center my-auto">{range}</div>
                   </div>
                 );
               })}
-            </>
+            </div>
           );
         })}
       </div>
 
-      <div className="w-1/2">
-        {Object.values(defPkmDamageRange).map((damage) => {
+      <div className="w-1/2 hidden sm:block">
+        {Object.values(defPkmDamageRange).map((damage, index) => {
           return (
-            <>
+            <div key={index}>
               {Object.entries(damage).map(([move, range]) => {
                 return (
-                  <div className="flex m-2">
+                  <div className="flex m-2" key={move}>
                     <div className="w-35 p-1 bg-gray-300 rounded-xl text-center">{move}</div>
                     <div className="pl-5 text-center my-auto">{range}</div>
                   </div>
                 );
               })}
-            </>
+            </div>
           );
         })}
       </div>
     </div>
   );
-}
+};
 
 export default CalcMoveDamage;

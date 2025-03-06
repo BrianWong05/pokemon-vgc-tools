@@ -1,4 +1,12 @@
-function Item({ item, onData }) {
+import { Item as PkmItem } from "@pkmn/data";
+import React from "react";
+
+interface IItemProps {
+  item: PkmItem;
+  onData?: (item: PkmItem) => void;
+}
+
+const Item: React.FunctionComponent<IItemProps> = ({ item, onData }) => {
   const name = item.name;
   // const itemImg = import.meta.glob(`../assets/images/items/${name.replace(/\s+/g, "_")}_SV.png`);
   const imagePath = `/pokemon-vgc-tools/images/items/${name.replace(/\s+/g, "_")}_SV.png`;
@@ -19,6 +27,6 @@ function Item({ item, onData }) {
       <hr className="w-screen ms:w-xl border-gray-700" />
     </div>
   );
-}
+};
 
 export default Item;
