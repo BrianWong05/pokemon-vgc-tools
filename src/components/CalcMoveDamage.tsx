@@ -65,7 +65,7 @@ const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ gens, a
               {Object.entries(damage).map(([move, range]) => {
                 return (
                   <div className="flex m-2" key={move}>
-                    <div className="w-35 p-1 bg-gray-300 rounded-xl text-center">{move}</div>
+                    <div className="w-35 p-1 bg-gray-700 text-gray-100 rounded-xl text-center font-medium">{move}</div>
                     <div className="pl-5 text-center my-auto">{range}</div>
                   </div>
                 );
@@ -82,7 +82,7 @@ const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ gens, a
               {Object.entries(damage).map(([move, range]) => {
                 return (
                   <div className="flex m-2" key={move}>
-                    <div className="w-35 p-1 bg-gray-300 rounded-xl text-center">{move}</div>
+                    <div className="w-35 p-1 bg-gray-700 text-gray-100 rounded-xl text-center font-medium">{move}</div>
                     <div className="pl-5 text-center my-auto">{range}</div>
                   </div>
                 );

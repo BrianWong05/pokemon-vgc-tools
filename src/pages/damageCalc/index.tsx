@@ -5,6 +5,24 @@ import CalcMoveDamage from "@/components/CalcMoveDamage";
 import Layout from "@/components/layout";
 import { Generations, Specie } from "@pkmn/data";
 
+interface RawDescData {
+  attackBoost?: number;
+  attackEVs?: string;
+  attackerItem?: string;
+  attackerTera?: string;
+  attackerName?: string;
+  defenseBoost?: number;
+  HPEVs?: string;
+  defenseEVs?: string;
+  defenderItem?: string;
+  defenderTera?: string;
+  defenderName?: string;
+}
+
+interface ResultWithRawDesc extends Omit<Result, 'rawDesc'> {
+  rawDesc?: RawDescData;
+}
+
 interface IDamageCalcProps {
   gens: Generations;
 }
@@ -128,7 +146,7 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
     [0, 0],
   ];
 
-  const rawDescs: { [key: number]: unknown | null } = {
+  const rawDescs: { [key: number]: RawDescData } = {
     0: {},
     1: {},
     2: {},
@@ -142,37 +160,37 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
     // console.log("result", result);
     damagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
     damageRange[index] = Array.isArray(result?.damage) ? (result.damage as number[]) : [0, 0];
-    rawDescs[index] = result?.rawDesc;
+    rawDescs[index] = (result as ResultWithRawDesc)?.rawDesc || {};
   });
 
   // console.log("raw", rawDescs);
   // console.log("damage", damageRange);
 
-  const getResultDesc = (rawDescs: { [key: number]: object }) => {
+  const getResultDesc = (rawDescs: { [key: number]: RawDescData }) => {
     const resultDescs: { [key: string]: { conclusion: string; damageRange: number[] } } = {};
     Object.entries(rawDescs).map(([key, value]) => {
       if (!isEmpty(value)) {
-        console.log("raw", value, Result["rawDesc"]);
+        console.log("raw", value);
         const attackBoost = value.attackBoost
           ? value.attackBoost > 0
             ? `+${value.attackBoost} `
             : value.attackBoost + " "
           : "";
-        const attackEVs = value.attackEVs;
+        const attackEVs = value.attackEVs || "";
         const attackItem = value.attackerItem ? value.attackerItem + " " : "";
         const atatckTera = value.attackerTera ? value.attackerTera + " " : "";
-        const attackName = value.attackerName;
+        const attackName = value.attackerName || "";
 
         const defendBoost = value.defenseBoost
           ? value.defenseBoost > 0
             ? `+${value.defenseBoost} `
             : value.defenseBoost + " "
           : "";
-        const HPEVs = value.HPEVs;
-        const defendEVs = value.defenseEVs;
+        const HPEVs = value.HPEVs || "";
+        const defendEVs = value.defenseEVs || "";
         const defendItem = value.defenderItem ? value.defenderItem + " " : "";
         const defendTera = value.defenderTera ? value.defenderTera + " " : "";
-        const defendName = value.defenderName;
+        const defendName = value.defenderName || "";
         const minDamage = Object.values(damageRange[key as keyof typeof damageRange])[0];
         const maxDamage = Object.values(damageRange[key as keyof typeof damageRange])[15];
 
@@ -207,37 +225,86 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
 
   return (
     <Layout fixed={false}>
-      <div className="flex flex-col mt-5">
-        <div className="mx-10">
-          <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
-          <div className="text-lg font-black mt-2 ml-2">
-            <div>{resultDesc}</div>
-            <div className="text-sm font-light">{possibleDamage && `Posible Damage amounts: (${possibleDamage})`}</div>
+      <div className="bg-[#24283B] min-h-screen text-gray-200 pt-20">
+        {/* Page Title */}
+        <div className="text-3xl text-center text-gray-200 mb-8 font-bold">
+          Damage Calculator
+        </div>
+
+        {/* Damage Results Section */}
+        <div className="mx-4 sm:mx-10 mb-8">
+          <div className="bg-[#333c67] rounded-xl p-6 shadow-lg border border-[#4e60b1]">
+            <h2 className="text-xl font-semibold mb-4 text-center text-gray-100">
+              Battle Results
+            </h2>
+            <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
+            
+            {/* Result Description */}
+            {resultDesc && (
+              <div className="mt-6 p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
+                <div className="text-lg font-semibold text-gray-100 mb-2">
+                  {resultDesc}
+                </div>
+                {possibleDamage && (
+                  <div className="text-sm text-gray-300">
+                    Possible Damage amounts: ({possibleDamage})
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex justify-between p-10">
-          <PokemonSelection
-            gens={gens}
-            initPkm={initPkm}
-            battlepkm={atkPkm}
-            onChangePkm={handleAttPkmChange}
-            onChangeStats={handleAttPkmStatsChange}
-          />
-          <div className="flex gap-x-2">
-            <button value={50} onClick={handlePkmLvlChange}>
-              Level 50
-            </button>
-            <button value={100} onClick={handlePkmLvlChange}>
-              Level 100
-            </button>
+
+        {/* Pokemon Selection Section */}
+        <div className="flex flex-col lg:flex-row justify-between gap-6 px-4 sm:px-10 pb-10">
+          {/* Attacker Pokemon */}
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">
+              Attacker
+            </h3>
+            <PokemonSelection
+              gens={gens}
+              initPkm={initPkm}
+              battlepkm={atkPkm}
+              onChangePkm={handleAttPkmChange}
+              onChangeStats={handleAttPkmStatsChange}
+            />
           </div>
-          <PokemonSelection
-            gens={gens}
-            initPkm={initPkm}
-            battlepkm={defPkm}
-            onChangePkm={handleDetPkmChange}
-            onChangeStats={handleDefPkmStatsChange}
-          />
+
+          {/* Level Selection */}
+          <div className="flex flex-col items-center justify-center gap-4 lg:mx-8">
+            <h3 className="text-lg font-semibold text-gray-100">Battle Level</h3>
+            <div className="flex flex-col gap-3">
+              <button 
+                value={50} 
+                onClick={handlePkmLvlChange}
+                className="bg-[#4e60b1] hover:bg-[#5a6bc4] text-white px-6 py-3 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] min-w-32"
+              >
+                Level 50
+              </button>
+              <button 
+                value={100} 
+                onClick={handlePkmLvlChange}
+                className="bg-[#4e60b1] hover:bg-[#5a6bc4] text-white px-6 py-3 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] min-w-32"
+              >
+                Level 100
+              </button>
+            </div>
+          </div>
+
+          {/* Defender Pokemon */}
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">
+              Defender
+            </h3>
+            <PokemonSelection
+              gens={gens}
+              initPkm={initPkm}
+              battlepkm={defPkm}
+              onChangePkm={handleDetPkmChange}
+              onChangeStats={handleDefPkmStatsChange}
+            />
+          </div>
         </div>
       </div>
     </Layout>
