@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import SearchBar from "@/components/SearchBar";
 import Pokemon from "@/components/Pokemon";
 import PokemonFilter from "@/components/PokemonFilter";
+import PokemonSort from "@/components/PokemonSort";
 import Layout from "@/components/layout";
 import { Generations, Specie } from "@pkmn/data";
 
@@ -19,6 +20,8 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
   const [selectedGenerations, setSelectedGenerations] = useState<number[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [typeFilterMode, setTypeFilterMode] = useState<"and" | "or">("or");
+  const [sortBy, setSortBy] = useState<string>("num");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Initialize search results when pkms changes
   useEffect(() => {
@@ -56,8 +59,35 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
       }
     }
 
+    // Apply sorting
+    filteredResults.sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      if (sortBy === "name") {
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+      } else if (sortBy === "num") {
+        aValue = a.num;
+        bValue = b.num;
+      } else if (sortBy === "total") {
+        aValue = Object.values(a.baseStats).reduce((sum, stat) => sum + stat, 0);
+        bValue = Object.values(b.baseStats).reduce((sum, stat) => sum + stat, 0);
+      } else {
+        // Individual stats (hp, atk, def, spa, spd, spe)
+        aValue = a.baseStats[sortBy as keyof typeof a.baseStats];
+        bValue = b.baseStats[sortBy as keyof typeof b.baseStats];
+      }
+
+      if (sortOrder === "asc") {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+
     setSearchResults(filteredResults);
-  }, [searchQuery, selectedGenerations, selectedTypes, typeFilterMode, pkms]);
+  }, [searchQuery, selectedGenerations, selectedTypes, typeFilterMode, sortBy, sortOrder, pkms]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -73,6 +103,11 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
 
   const handleTypeFilterModeChange = (mode: "and" | "or") => {
     setTypeFilterMode(mode);
+  };
+
+  const handleSortChange = (newSortBy: string, newSortOrder: "asc" | "desc") => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
   };
 
   // console.log(pkms[0]);
@@ -91,6 +126,13 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
               onGenerationsChange={handleGenerationsChange}
               onTypesChange={handleTypesChange}
               onTypeFilterModeChange={handleTypeFilterModeChange}
+            />
+          </div>
+          <div className="mt-4">
+            <PokemonSort
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortChange={handleSortChange}
             />
           </div>
         </div>
