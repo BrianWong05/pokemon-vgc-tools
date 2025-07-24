@@ -154,18 +154,18 @@ const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
             </span>
           ))}
           {selectedTypes.map((type) => (
-            <span
+            <div
               key={`type-${type}`}
-              className="bg-green-600 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1"
+              className="flex items-center gap-1 bg-gray-800 rounded-full pl-1 pr-2 py-1"
             >
-              {type}
+              <TypeTag type={type.toLowerCase()} />
               <button
                 onClick={() => handleTypeToggle(type)}
-                className="ml-1 hover:bg-green-700 rounded-full w-4 h-4 flex items-center justify-center"
+                className="hover:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-gray-300 hover:text-white transition-colors duration-200"
               >
                 x
               </button>
-            </span>
+            </div>
           ))}
         </div>
       )}
