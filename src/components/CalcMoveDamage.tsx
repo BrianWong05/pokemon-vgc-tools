@@ -6,9 +6,21 @@ interface ICalcMoveDamageProps {
   gens: typeof Generations.prototype;
   atkPkm: typeof Pokemon.prototype;
   defPkm: typeof Pokemon.prototype;
+  onMoveSelect?: (moveIndex: number) => void;
+  selectedMoveIndex?: number | null;
+  onDefenderMoveSelect?: (moveIndex: number) => void;
+  selectedDefenderMoveIndex?: number | null;
 }
 
-const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ gens, atkPkm, defPkm }) => {
+const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ 
+  gens, 
+  atkPkm, 
+  defPkm, 
+  onMoveSelect, 
+  selectedMoveIndex, 
+  onDefenderMoveSelect, 
+  selectedDefenderMoveIndex
+}) => {
   const gen = gens.get(9);
   console.log("gen", gen);
 
@@ -59,13 +71,30 @@ const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ gens, a
   return (
     <div className="w-full flex justify-between">
       <div className="w-full sm:w-1/2">
+        <h3 className="text-lg font-semibold mb-3 text-center text-gray-100">
+          Attacker Moves (Click to select for result)
+        </h3>
         {Object.values(atkPkmDamageRange).map((damage, index) => {
           return (
             <div key={index}>
               {Object.entries(damage).map(([move, range]) => {
+                const isSelected = selectedMoveIndex === index;
+                const isClickable = move !== "No Move" && onMoveSelect;
                 return (
-                  <div className="flex m-2" key={move}>
-                    <div className="w-35 p-1 bg-gray-700 text-gray-100 rounded-xl text-center font-medium">{move}</div>
+                  <div 
+                    className={`flex m-2 ${isClickable ? 'cursor-pointer' : ''} ${isSelected ? 'ring-2 ring-blue-400' : ''}`} 
+                    key={move}
+                    onClick={() => isClickable && onMoveSelect(index)}
+                  >
+                    <div className={`w-35 p-1 text-gray-100 rounded-xl text-center font-medium transition-colors duration-200 ${
+                      isSelected 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : isClickable 
+                          ? 'bg-gray-700 hover:bg-gray-600' 
+                          : 'bg-gray-700'
+                    }`}>
+                      {move}
+                    </div>
                     <div className="pl-5 text-center my-auto">{range}</div>
                   </div>
                 );
@@ -76,13 +105,30 @@ const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({ gens, a
       </div>
 
       <div className="w-1/2 hidden sm:block">
+        <h3 className="text-lg font-semibold mb-3 text-center text-gray-100">
+          Defender Moves (Click to select for result)
+        </h3>
         {Object.values(defPkmDamageRange).map((damage, index) => {
           return (
             <div key={index}>
               {Object.entries(damage).map(([move, range]) => {
+                const isSelected = selectedDefenderMoveIndex === index;
+                const isClickable = move !== "No Move" && onDefenderMoveSelect;
                 return (
-                  <div className="flex m-2" key={move}>
-                    <div className="w-35 p-1 bg-gray-700 text-gray-100 rounded-xl text-center font-medium">{move}</div>
+                  <div 
+                    className={`flex m-2 ${isClickable ? 'cursor-pointer' : ''} ${isSelected ? 'ring-2 ring-blue-400' : ''}`} 
+                    key={move}
+                    onClick={() => isClickable && onDefenderMoveSelect(index)}
+                  >
+                    <div className={`w-35 p-1 text-gray-100 rounded-xl text-center font-medium transition-colors duration-200 ${
+                      isSelected 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : isClickable 
+                          ? 'bg-gray-700 hover:bg-gray-600' 
+                          : 'bg-gray-700'
+                    }`}>
+                      {move}
+                    </div>
                     <div className="pl-5 text-center my-auto">{range}</div>
                   </div>
                 );

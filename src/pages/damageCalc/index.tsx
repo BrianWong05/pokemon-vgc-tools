@@ -38,6 +38,8 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
   const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [resultDesc, setResultDesc] = useState("");
   const [possibleDamage, setPossibleDamage] = useState("");
+  const [selectedMoveIndex, setSelectedMoveIndex] = useState<number | null>(null);
+  const [selectedDefenderMoveIndex, setSelectedDefenderMoveIndex] = useState<number | null>(null);
 
   const handleAttPkmChange = (name: string) => {
     setAtkPkm(new Pokemon(gen, name, { level: initLvl, ivs: initIVs, evs: initEVs }));
@@ -146,7 +148,21 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
     [0, 0],
   ];
 
+  const defenderDamageRange: number[][] = [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ];
+
   const rawDescs: { [key: number]: RawDescData } = {
+    0: {},
+    1: {},
+    2: {},
+    3: {},
+  };
+
+  const defenderRawDescs: { [key: number]: RawDescData } = {
     0: {},
     1: {},
     2: {},
@@ -163,10 +179,25 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
     rawDescs[index] = (result as ResultWithRawDesc)?.rawDesc || {};
   });
 
+  // Calculate defender moves damage
+  const defenderDamagePercentageRange: { [key: number]: { [move: string]: string } } = {
+    0: { "No Move": "0% - 0%" },
+    1: { "No Move": "0% - 0%" },
+    2: { "No Move": "0% - 0%" },
+    3: { "No Move": "0% - 0%" },
+  };
+
+  defPkm.moves.forEach((move, index) => {
+    const result = move ? calculate(gen, defPkm, atkPkm, new Move(gen, move)) : null;
+    defenderDamagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
+    defenderDamageRange[index] = Array.isArray(result?.damage) ? (result.damage as number[]) : [0, 0];
+    defenderRawDescs[index] = (result as ResultWithRawDesc)?.rawDesc || {};
+  });
+
   // console.log("raw", rawDescs);
   // console.log("damage", damageRange);
 
-  const getResultDesc = (rawDescs: { [key: number]: RawDescData }) => {
+  const getResultDesc = (rawDescs: { [key: number]: RawDescData }, damageRangeData: number[][], damagePercentageData: { [key: number]: { [move: string]: string } }, isDefender: boolean = false) => {
     const resultDescs: { [key: string]: { conclusion: string; damageRange: number[] } } = {};
     Object.entries(rawDescs).map(([key, value]) => {
       if (!isEmpty(value)) {
@@ -191,17 +222,17 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
         const defendItem = value.defenderItem ? value.defenderItem + " " : "";
         const defendTera = value.defenderTera ? value.defenderTera + " " : "";
         const defendName = value.defenderName || "";
-        const minDamage = Object.values(damageRange[key as keyof typeof damageRange])[0];
-        const maxDamage = Object.values(damageRange[key as keyof typeof damageRange])[15];
+        const minDamage = Object.values(damageRangeData[key as keyof typeof damageRangeData])[0];
+        const maxDamage = Object.values(damageRangeData[key as keyof typeof damageRangeData])[15];
 
         const conclusion = `${attackBoost}${attackEVs} ${attackItem}${atatckTera}${attackName} ${Object.keys(
-          damagePercentageRange[Number(key)],
+          damagePercentageData[Number(key)],
         )} VS. ${defendBoost}${HPEVs} / ${defendEVs} ${defendItem}${defendTera}${defendName}: ${minDamage}-${maxDamage} (${Object.values(
-          damagePercentageRange[Number(key)],
+          damagePercentageData[Number(key)],
         )})`;
         resultDescs[key] = {
           conclusion: conclusion,
-          damageRange: damageRange[key as keyof typeof damageRange] as number[],
+          damageRange: damageRangeData[key as keyof typeof damageRangeData] as number[],
         };
         console.log(resultDescs);
       }
@@ -209,19 +240,46 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
     return resultDescs;
   };
 
-  const conclusion = getResultDesc(rawDescs);
-  console.log("con", conclusion);
+  const attackerConclusion = getResultDesc(rawDescs, damageRange, damagePercentageRange, false);
+  const defenderConclusion = getResultDesc(defenderRawDescs, defenderDamageRange, defenderDamagePercentageRange, true);
+  
+  // Combine both conclusions for selection logic
+  const allConclusions = { 
+    ...Object.fromEntries(Object.entries(attackerConclusion).map(([key, value]) => [`attacker_${key}`, value])),
+    ...Object.fromEntries(Object.entries(defenderConclusion).map(([key, value]) => [`defender_${key}`, value]))
+  };
+  
+  console.log("attacker conclusion", attackerConclusion);
+  console.log("defender conclusion", defenderConclusion);
 
   console.log(atkPkm, defPkm);
 
   useEffect(() => {
-    if (!isEmpty(conclusion)) {
-      const key = Object.entries(conclusion).sort((a, b) => cmp(a[1], b[1]))[0][0];
-      console.log("last one", key, conclusion[key as keyof typeof conclusion]["damageRange"]);
-      setResultDesc(conclusion[key as keyof typeof conclusion]["conclusion"] || "");
-      setPossibleDamage((conclusion[key as keyof typeof conclusion]["damageRange"] as number[]).toString());
+    if (!isEmpty(allConclusions)) {
+      let selectedKey: string;
+      
+      // Determine which move to show based on selections
+      if (selectedMoveIndex !== null && attackerConclusion[selectedMoveIndex]) {
+        selectedKey = `attacker_${selectedMoveIndex}`;
+      } else if (selectedDefenderMoveIndex !== null && defenderConclusion[selectedDefenderMoveIndex]) {
+        selectedKey = `defender_${selectedDefenderMoveIndex}`;
+      } else {
+        // Auto-select highest damage move from attacker moves only
+        const attackerEntries = Object.entries(attackerConclusion);
+        if (attackerEntries.length > 0) {
+          const highestAttackerMove = attackerEntries.sort((a, b) => cmp(a[1], b[1]))[0][0];
+          selectedKey = `attacker_${highestAttackerMove}`;
+        } else {
+          // Fallback to all moves if no attacker moves available
+          selectedKey = Object.entries(allConclusions).sort((a, b) => cmp(a[1], b[1]))[0][0];
+        }
+      }
+      
+      console.log("selected attacker move:", selectedMoveIndex, "selected defender move:", selectedDefenderMoveIndex, "using key:", selectedKey);
+      setResultDesc(allConclusions[selectedKey]["conclusion"] || "");
+      setPossibleDamage((allConclusions[selectedKey]["damageRange"] as number[]).toString());
     }
-  }, [conclusion]);
+  }, [allConclusions, selectedMoveIndex, selectedDefenderMoveIndex, attackerConclusion, defenderConclusion]);
 
   return (
     <Layout fixed={false}>
@@ -237,17 +295,54 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
             <h2 className="text-xl font-semibold mb-4 text-center text-gray-100">
               Battle Results
             </h2>
-            <CalcMoveDamage gens={gens} atkPkm={atkPkm} defPkm={defPkm} />
+            <CalcMoveDamage 
+              gens={gens} 
+              atkPkm={atkPkm} 
+              defPkm={defPkm} 
+              onMoveSelect={(index) => {
+                setSelectedMoveIndex(index);
+                setSelectedDefenderMoveIndex(null);
+              }}
+              selectedMoveIndex={selectedMoveIndex}
+              onDefenderMoveSelect={(index) => {
+                setSelectedDefenderMoveIndex(index);
+                setSelectedMoveIndex(null);
+              }}
+              selectedDefenderMoveIndex={selectedDefenderMoveIndex}
+            />
             
             {/* Result Description */}
             {resultDesc && (
               <div className="mt-6 p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
-                <div className="text-lg font-semibold text-gray-100 mb-2">
-                  {resultDesc}
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-lg font-semibold text-gray-100">
+                    {resultDesc}
+                  </div>
+                  {(selectedMoveIndex !== null || selectedDefenderMoveIndex !== null) && (
+                    <button
+                      onClick={() => {
+                        setSelectedMoveIndex(null);
+                        setSelectedDefenderMoveIndex(null);
+                      }}
+                      className="px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                    >
+                      Auto Select
+                    </button>
+                  )}
                 </div>
                 {possibleDamage && (
                   <div className="text-sm text-gray-300">
                     Possible Damage amounts: ({possibleDamage})
+                  </div>
+                )}
+                {(selectedMoveIndex !== null || selectedDefenderMoveIndex !== null) && (
+                  <div className="text-sm text-blue-300 mt-1">
+                    {selectedMoveIndex !== null && (
+                      <>Showing result for Attacker Move {selectedMoveIndex + 1}</>
+                    )}
+                    {selectedDefenderMoveIndex !== null && (
+                      <>Showing result for Defender Move {selectedDefenderMoveIndex + 1} (roles reversed)</>
+                    )}
                   </div>
                 )}
               </div>
