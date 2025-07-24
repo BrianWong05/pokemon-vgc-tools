@@ -4,16 +4,20 @@ import TypeTag from "@/components/TypeTag";
 interface IPokemonFilterProps {
   selectedGenerations: number[];
   selectedTypes: string[];
+  typeFilterMode: "and" | "or";
   onGenerationsChange: (gens: number[]) => void;
   onTypesChange: (types: string[]) => void;
+  onTypeFilterModeChange: (mode: "and" | "or") => void;
   className?: string;
 }
 
 const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
   selectedGenerations,
   selectedTypes,
+  typeFilterMode,
   onGenerationsChange,
   onTypesChange,
+  onTypeFilterModeChange,
   className = "",
 }) => {
   const [showGenerations, setShowGenerations] = useState(false);
@@ -108,6 +112,35 @@ const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
           {showTypes && (
             <div className="absolute z-20 mt-16 bg-[#24283B] backdrop-blur-md rounded-xl border border-[#4e60b1] p-6 shadow-2xl min-w-[32rem] max-w-[36rem]">
               <h3 className="text-gray-200 font-semibold mb-4 text-center">Select Types</h3>
+              
+              {/* AND/OR Toggle */}
+              {selectedTypes.length > 1 && (
+                <div className="flex justify-center mb-4">
+                  <div className="flex bg-gray-700 rounded-lg p-1">
+                    <button
+                      onClick={() => onTypeFilterModeChange("or")}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${
+                        typeFilterMode === "or"
+                          ? "bg-[#4e60b1] text-white"
+                          : "text-gray-300 hover:text-white"
+                      }`}
+                    >
+                      OR (Any type)
+                    </button>
+                    <button
+                      onClick={() => onTypeFilterModeChange("and")}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${
+                        typeFilterMode === "and"
+                          ? "bg-[#4e60b1] text-white"
+                          : "text-gray-300 hover:text-white"
+                      }`}
+                    >
+                      AND (All types)
+                    </button>
+                  </div>
+                </div>
+              )}
+              
               <div className="grid grid-cols-3 gap-2">
                 {types.map((type) => (
                   <label key={type} className="flex items-center space-x-2 cursor-pointer hover:bg-[#333c67] p-1.5 rounded-lg transition-colors duration-200">
@@ -138,35 +171,47 @@ const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
 
       {/* Active Filters Display */}
       {(selectedGenerations.length > 0 || selectedTypes.length > 0) && (
-        <div className="flex flex-wrap gap-2 justify-center">
-          {selectedGenerations.map((gen) => (
-            <span
-              key={`gen-${gen}`}
-              className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1"
-            >
-              Gen {gen}
-              <button
-                onClick={() => handleGenerationToggle(gen)}
-                className="ml-1 hover:bg-blue-700 rounded-full w-4 h-4 flex items-center justify-center"
-              >
-                x
-              </button>
-            </span>
-          ))}
-          {selectedTypes.map((type) => (
-            <div
-              key={`type-${type}`}
-              className="flex items-center gap-1 bg-gray-800 rounded-full pl-1 pr-2 py-1"
-            >
-              <TypeTag type={type.toLowerCase()} />
-              <button
-                onClick={() => handleTypeToggle(type)}
-                className="hover:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-gray-300 hover:text-white transition-colors duration-200"
-              >
-                x
-              </button>
+        <div className="flex flex-col gap-3">
+          {/* Filter Mode Indicator */}
+          {selectedTypes.length > 1 && (
+            <div className="flex justify-center">
+              <span className="bg-[#4e60b1] text-white px-3 py-1 rounded-full text-xs font-medium">
+                Types: {typeFilterMode.toUpperCase()} logic
+              </span>
             </div>
-          ))}
+          )}
+          
+          {/* Active Filters */}
+          <div className="flex flex-wrap gap-2 justify-center">
+            {selectedGenerations.map((gen) => (
+              <span
+                key={`gen-${gen}`}
+                className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1"
+              >
+                Gen {gen}
+                <button
+                  onClick={() => handleGenerationToggle(gen)}
+                  className="ml-1 hover:bg-blue-700 rounded-full w-4 h-4 flex items-center justify-center"
+                >
+                  x
+                </button>
+              </span>
+            ))}
+            {selectedTypes.map((type) => (
+              <div
+                key={`type-${type}`}
+                className="flex items-center gap-1 bg-gray-800 rounded-full pl-1 pr-2 py-1"
+              >
+                <TypeTag type={type.toLowerCase()} />
+                <button
+                  onClick={() => handleTypeToggle(type)}
+                  className="hover:bg-gray-700 rounded-full w-5 h-5 flex items-center justify-center text-gray-300 hover:text-white transition-colors duration-200"
+                >
+                  x
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

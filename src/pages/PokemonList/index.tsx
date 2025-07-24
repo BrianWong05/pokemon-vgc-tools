@@ -18,6 +18,7 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGenerations, setSelectedGenerations] = useState<number[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [typeFilterMode, setTypeFilterMode] = useState<"and" | "or">("or");
 
   // Initialize search results when pkms changes
   useEffect(() => {
@@ -44,11 +45,19 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
 
     // Apply type filter
     if (selectedTypes.length > 0) {
-      filteredResults = filteredResults.filter((pkm) => pkm.types.some((type) => selectedTypes.includes(type)));
+      if (typeFilterMode === "or") {
+        // OR logic: Pokemon must have at least one of the selected types
+        filteredResults = filteredResults.filter((pkm) => pkm.types.some((type) => selectedTypes.includes(type)));
+      } else {
+        // AND logic: Pokemon must have all selected types
+        filteredResults = filteredResults.filter((pkm) => 
+          selectedTypes.every((selectedType) => pkm.types.includes(selectedType))
+        );
+      }
     }
 
     setSearchResults(filteredResults);
-  }, [searchQuery, selectedGenerations, selectedTypes, pkms]);
+  }, [searchQuery, selectedGenerations, selectedTypes, typeFilterMode, pkms]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -62,6 +71,10 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
     setSelectedTypes(types);
   };
 
+  const handleTypeFilterModeChange = (mode: "and" | "or") => {
+    setTypeFilterMode(mode);
+  };
+
   // console.log(pkms[0]);
 
   return (
@@ -70,13 +83,16 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
         <div className="sticky -top-2 bg-[#24283B50] pb-7 z-10 backdrop-blur-xs">
           <div className="text-3xl text-center text-gray-200 h-25 pt-10 backdrop-blur">Pokemon</div>
           <SearchBar onSearch={handleSearch} placeholder="Pokemon / Type" />
-          <PokemonFilter
-            selectedGenerations={selectedGenerations}
-            selectedTypes={selectedTypes}
-            onGenerationsChange={handleGenerationsChange}
-            onTypesChange={handleTypesChange}
-            className="mt-4"
-          />
+          <div className="mt-6">
+            <PokemonFilter
+              selectedGenerations={selectedGenerations}
+              selectedTypes={selectedTypes}
+              typeFilterMode={typeFilterMode}
+              onGenerationsChange={handleGenerationsChange}
+              onTypesChange={handleTypesChange}
+              onTypeFilterModeChange={handleTypeFilterModeChange}
+            />
+          </div>
         </div>
         <div className="flex flex-wrap justify-evenly">
           {searchResults.map((pkm) => {
