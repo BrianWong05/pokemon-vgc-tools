@@ -53,36 +53,47 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
         filteredResults = filteredResults.filter((pkm) => pkm.types.some((type) => selectedTypes.includes(type)));
       } else {
         // AND logic: Pokemon must have all selected types
-        filteredResults = filteredResults.filter((pkm) => 
-          selectedTypes.every((selectedType) => pkm.types.includes(selectedType))
+        filteredResults = filteredResults.filter((pkm) =>
+          selectedTypes.every((selectedType) => pkm.types.some(type => type === selectedType)),
         );
       }
     }
 
     // Apply sorting
     filteredResults.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
       if (sortBy === "name") {
-        aValue = a.name.toLowerCase();
-        bValue = b.name.toLowerCase();
+        const aValue = a.name.toLowerCase();
+        const bValue = b.name.toLowerCase();
+        if (sortOrder === "asc") {
+          return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+        } else {
+          return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        }
       } else if (sortBy === "num") {
-        aValue = a.num;
-        bValue = b.num;
+        const aValue = a.num;
+        const bValue = b.num;
+        if (sortOrder === "asc") {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
       } else if (sortBy === "total") {
-        aValue = Object.values(a.baseStats).reduce((sum, stat) => sum + stat, 0);
-        bValue = Object.values(b.baseStats).reduce((sum, stat) => sum + stat, 0);
+        const aValue = Object.values(a.baseStats).reduce((sum, stat) => sum + stat, 0);
+        const bValue = Object.values(b.baseStats).reduce((sum, stat) => sum + stat, 0);
+        if (sortOrder === "asc") {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
       } else {
         // Individual stats (hp, atk, def, spa, spd, spe)
-        aValue = a.baseStats[sortBy as keyof typeof a.baseStats];
-        bValue = b.baseStats[sortBy as keyof typeof b.baseStats];
-      }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+        const aValue = a.baseStats[sortBy as keyof typeof a.baseStats];
+        const bValue = b.baseStats[sortBy as keyof typeof b.baseStats];
+        if (sortOrder === "asc") {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
       }
     });
 
@@ -129,11 +140,7 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
             />
           </div>
           <div className="mt-4">
-            <PokemonSort
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-              onSortChange={handleSortChange}
-            />
+            <PokemonSort sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
           </div>
         </div>
         <div className="flex flex-wrap justify-evenly">
