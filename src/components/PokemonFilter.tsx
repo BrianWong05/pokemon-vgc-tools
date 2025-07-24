@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import TypeTag from "@/components/TypeTag";
 
 interface IPokemonFilterProps {
   selectedGenerations: number[];
@@ -72,22 +73,23 @@ const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
         <div className="flex flex-col items-center relative" ref={generationsRef}>
           <button
             onClick={() => setShowGenerations(!showGenerations)}
-            className="bg-black/80 text-gray-100 rounded-xl py-2 px-4 backdrop-blur border border-gray-600 hover:border-blue-400 focus:outline-none transition-colors duration-200 min-w-40"
+            className="bg-[#24283B] text-gray-100 rounded-xl py-3 px-6 backdrop-blur border border-[#333c67] hover:border-[#4e60b1] hover:bg-[#333c67] focus:outline-none focus:ring-2 focus:ring-[#4e60b1] transition-all duration-200 min-w-44 font-medium shadow-lg"
           >
             Generations {selectedGenerations.length > 0 && `(${selectedGenerations.length})`}
           </button>
           {showGenerations && (
-            <div className="absolute z-20 mt-12 bg-black/90 backdrop-blur rounded-xl border border-gray-600 p-4 shadow-lg">
-              <div className="grid grid-cols-3 gap-2 max-w-xs">
+            <div className="absolute z-20 mt-16 bg-[#24283B] backdrop-blur-md rounded-xl border border-[#4e60b1] p-6 shadow-2xl min-w-80">
+              <h3 className="text-gray-200 font-semibold mb-4 text-center">Select Generations</h3>
+              <div className="grid grid-cols-3 gap-3">
                 {generations.map((gen) => (
-                  <label key={gen} className="flex items-center space-x-2 cursor-pointer">
+                  <label key={gen} className="flex items-center space-x-2 cursor-pointer hover:bg-[#333c67] p-2 rounded-lg transition-colors duration-200">
                     <input
                       type="checkbox"
                       checked={selectedGenerations.includes(gen)}
                       onChange={() => handleGenerationToggle(gen)}
-                      className="rounded border-gray-400 text-blue-500 focus:ring-blue-400"
+                      className="rounded border-gray-400 text-blue-500 focus:ring-blue-400 focus:ring-2"
                     />
-                    <span className="text-gray-200 text-sm">Gen {gen}</span>
+                    <span className="text-gray-200 text-sm whitespace-nowrap">Gen {gen}</span>
                   </label>
                 ))}
               </div>
@@ -99,22 +101,23 @@ const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
         <div className="flex flex-col items-center relative" ref={typesRef}>
           <button
             onClick={() => setShowTypes(!showTypes)}
-            className="bg-black/80 text-gray-100 rounded-xl py-2 px-4 backdrop-blur border border-gray-600 hover:border-blue-400 focus:outline-none transition-colors duration-200 min-w-40"
+            className="bg-[#24283B] text-gray-100 rounded-xl py-3 px-6 backdrop-blur border border-[#333c67] hover:border-[#4e60b1] hover:bg-[#333c67] focus:outline-none focus:ring-2 focus:ring-[#4e60b1] transition-all duration-200 min-w-44 font-medium shadow-lg"
           >
             Types {selectedTypes.length > 0 && `(${selectedTypes.length})`}
           </button>
           {showTypes && (
-            <div className="absolute z-20 mt-12 bg-black/90 backdrop-blur rounded-xl border border-gray-600 p-4 shadow-lg">
-              <div className="grid grid-cols-3 gap-2 max-w-md">
+            <div className="absolute z-20 mt-16 bg-[#24283B] backdrop-blur-md rounded-xl border border-[#4e60b1] p-6 shadow-2xl min-w-[32rem] max-w-[36rem]">
+              <h3 className="text-gray-200 font-semibold mb-4 text-center">Select Types</h3>
+              <div className="grid grid-cols-3 gap-2">
                 {types.map((type) => (
-                  <label key={type} className="flex items-center space-x-2 cursor-pointer">
+                  <label key={type} className="flex items-center space-x-2 cursor-pointer hover:bg-[#333c67] p-1.5 rounded-lg transition-colors duration-200">
                     <input
                       type="checkbox"
                       checked={selectedTypes.includes(type)}
                       onChange={() => handleTypeToggle(type)}
-                      className="rounded border-gray-400 text-blue-500 focus:ring-blue-400"
+                      className="rounded border-gray-400 text-blue-500 focus:ring-blue-400 focus:ring-2 flex-shrink-0"
                     />
-                    <span className="text-gray-200 text-sm">{type}</span>
+                    <TypeTag type={type.toLowerCase()} />
                   </label>
                 ))}
               </div>
@@ -126,7 +129,7 @@ const PokemonFilter: React.FunctionComponent<IPokemonFilterProps> = ({
         {(selectedGenerations.length > 0 || selectedTypes.length > 0) && (
           <button
             onClick={clearAllFilters}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl transition-colors duration-200"
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl transition-all duration-200 font-medium shadow-lg focus:outline-none focus:ring-2 focus:ring-red-400"
           >
             Clear Filters
           </button>
