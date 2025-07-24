@@ -65,7 +65,20 @@ const PokemonId: React.FunctionComponent<IPokemonIdProps> = ({ gens }) => {
   console.log(pkm.num, pkm, baseStats);
   return (
     <Layout>
-      <div className="text-gray-200 bg-[#24283B] h-full min-h-screen w-full justify-center">
+      <div className="text-gray-200 bg-[#24283B] h-full min-h-screen w-full justify-center pt-20">
+        {/* Back Button */}
+        <div className="flex justify-start mb-6 px-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 bg-[#333c67] hover:bg-[#4e60b1] text-gray-200 px-4 py-2 rounded-xl transition-colors duration-200 font-medium shadow-lg cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+        </div>
+
         <div className="flex w-full justify-center">
           <div className="relative">
             <div className="w-38 h-38 rounded-full bg-white absolute top-3 left-3">
