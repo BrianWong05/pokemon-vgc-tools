@@ -128,7 +128,20 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
       <div className="bg-[#24283B] w-full pt-15">
         <div className="sticky -top-2 bg-[#24283B50] pb-7 z-10 backdrop-blur-xs">
           <div className="text-3xl text-center text-gray-200 h-25 pt-10 backdrop-blur">Pokemon</div>
-          <SearchBar onSearch={handleSearch} placeholder="Pokemon / Type" />
+          
+          {/* Search Bar and Sort Side by Side */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center px-4">
+            <div className="w-full sm:w-auto flex-1 max-w-xl">
+              <SearchBar onSearch={handleSearch} placeholder="Pokemon / Type" />
+            </div>
+            <div className="w-full sm:w-auto">
+              <PokemonSort
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={handleSortChange}
+              />
+            </div>
+          </div>
           <div className="mt-6">
             <PokemonFilter
               selectedGenerations={selectedGenerations}
@@ -139,11 +152,8 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
               onTypeFilterModeChange={handleTypeFilterModeChange}
             />
           </div>
-          <div className="mt-4">
-            <PokemonSort sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
-          </div>
         </div>
-        <div className="flex flex-wrap justify-evenly">
+        <div className="flex flex-wrap justify-evenly pt-8">
           {searchResults.map((pkm) => {
             return <Pokemon key={pkm.id} pkm={pkm} onData={onData} />;
           })}
