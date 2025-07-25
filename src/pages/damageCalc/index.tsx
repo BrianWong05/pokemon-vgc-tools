@@ -38,6 +38,7 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
   const [atkPkm, setAtkPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [field, setField] = useState(new Field());
+  const [battleFormat, setBattleFormat] = useState<"singles" | "doubles">("singles");
   const [resultDesc, setResultDesc] = useState("");
   const [possibleDamage, setPossibleDamage] = useState("");
   const [selectedMoveIndex, setSelectedMoveIndex] = useState<number | null>(null);
@@ -60,6 +61,16 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
   };
 
   const handleFieldChange = (newField: Field) => {
+    setField(newField);
+  };
+
+  const handleBattleFormatChange = (format: "singles" | "doubles") => {
+    setBattleFormat(format);
+    // Update field with battle format - doubles battles can affect certain calculations
+    const newField = new Field({
+      ...field,
+      gameType: format === "doubles" ? "Doubles" : "Singles",
+    });
     setField(newField);
   };
 
@@ -416,6 +427,33 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
 
             {/* Battle Level and Field Selection - Center Column */}
             <div className="flex-1">
+              {/* Battle Format Selection */}
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">Battle Format</h3>
+                <div className="flex gap-3 justify-center">
+                  <button 
+                    onClick={() => handleBattleFormatChange("singles")}
+                    className={`px-4 py-2 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] flex-1 ${
+                      battleFormat === "singles" 
+                        ? "bg-[#4e60b1] text-white" 
+                        : "bg-[#333c67] text-gray-300 hover:bg-[#3d4785]"
+                    }`}
+                  >
+                    Singles
+                  </button>
+                  <button 
+                    onClick={() => handleBattleFormatChange("doubles")}
+                    className={`px-4 py-2 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] flex-1 ${
+                      battleFormat === "doubles" 
+                        ? "bg-[#4e60b1] text-white" 
+                        : "bg-[#333c67] text-gray-300 hover:bg-[#3d4785]"
+                    }`}
+                  >
+                    Doubles
+                  </button>
+                </div>
+              </div>
+
               {/* Battle Level Selection */}
               <div className="mb-6">
                 <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">Battle Level</h3>
