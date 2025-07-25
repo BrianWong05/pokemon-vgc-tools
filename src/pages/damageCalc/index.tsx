@@ -92,6 +92,34 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
     setDefPkm(pkm[1].clone());
   };
 
+  // Calculate HKO probabilities like Pokemon Showdown
+  const calculateHKOChance = (damages: number[], defenderHP: number) => {
+    if (!damages || damages.length === 0) return "";
+    
+    const hkoResults = [];
+    
+    // Check for OHKO
+    const ohkoCount = damages.filter(damage => damage >= defenderHP).length;
+    if (ohkoCount > 0) {
+      const ohkoChance = ((ohkoCount / damages.length) * 100).toFixed(1);
+      return `${ohkoChance}% chance to OHKO`;
+    }
+    
+    // Check for 2HKO, 3HKO, etc.
+    for (let hits = 2; hits <= 4; hits++) {
+      const requiredDamagePerHit = defenderHP / hits;
+      const hkoCount = damages.filter(damage => damage >= requiredDamagePerHit).length;
+      
+      if (hkoCount > 0) {
+        const hkoChance = ((hkoCount / damages.length) * 100).toFixed(1);
+        hkoResults.push(`${hkoChance}% chance to ${hits}HKO`);
+        break; // Only show the first achievable HKO
+      }
+    }
+    
+    return hkoResults.length > 0 ? hkoResults[0] : "";
+  };
+
   const calcDamageRange = (result: Result) => {
     const move = result.move.name;
     const damages = result.damage as number[];
@@ -225,11 +253,23 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
         const minDamage = Object.values(damageRangeData[key as keyof typeof damageRangeData])[0];
         const maxDamage = Object.values(damageRangeData[key as keyof typeof damageRangeData])[15];
 
-        const conclusion = `${attackBoost}${attackEVs} ${attackItem}${atatckTera}${attackName} ${Object.keys(
+        // Calculate HKO for the conclusion
+        const damages = damageRangeData[key as keyof typeof damageRangeData] as number[];
+        const defenderHP = isDefender ? atkPkm.stats.hp : defPkm.stats.hp;
+        const hkoText = calculateHKOChance(damages, defenderHP);
+
+        // Get the percentage range without HKO info for the main description
+        const percentageRange = Object.values(damagePercentageData[Number(key)])[0].replace(/ \(.*?\)$/, '');
+
+        let conclusion = `${attackBoost}${attackEVs} ${attackItem}${atatckTera}${attackName} ${Object.keys(
           damagePercentageData[Number(key)],
-        )} VS. ${defendBoost}${HPEVs} / ${defendEVs} ${defendItem}${defendTera}${defendName}: ${minDamage}-${maxDamage} (${Object.values(
-          damagePercentageData[Number(key)],
-        )})`;
+        )} VS. ${defendBoost}${HPEVs} / ${defendEVs} ${defendItem}${defendTera}${defendName}: ${minDamage}-${maxDamage} (${percentageRange})`;
+        
+        // Add HKO information at the end if available
+        if (hkoText) {
+          conclusion += ` -- ${hkoText}`;
+        }
+
         resultDescs[key] = {
           conclusion: conclusion,
           damageRange: damageRangeData[key as keyof typeof damageRangeData] as number[],
