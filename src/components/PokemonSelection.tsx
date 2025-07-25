@@ -248,23 +248,26 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
           })}
         </div>
       </div>
-      {/* Nature Selection */}
-      <div className="mb-4 p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
-        <label className="block text-gray-300 font-medium mb-2">Nature:</label>
-        <NatureList gens={gens} onData={handlePkmNatureChange} init={battlepkm.nature} />
-      </div>
-      
-      {/* Ability Selection */}
-      <div className="mb-4 p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
-        <label className="block text-gray-300 font-medium mb-2">Ability:</label>
-        <select 
-          onChange={handlePkmAbilityChange}
-          className="w-full px-3 py-2 bg-[#333c67] border border-gray-600 rounded-lg text-gray-200 focus:border-[#4e60b1] focus:outline-none"
-        >
-          {pkmAbility.map((ability) => {
-            return <option key={ability} value={ability}>{ability}</option>;
-          })}
-        </select>
+      {/* Nature and Ability Selection - Side by Side */}
+      <div className="mb-4 grid grid-cols-2 gap-4">
+        {/* Nature Selection */}
+        <div className="p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
+          <label className="block text-gray-300 font-medium mb-2">Nature:</label>
+          <NatureList gens={gens} onData={handlePkmNatureChange} init={battlepkm.nature} />
+        </div>
+        
+        {/* Ability Selection */}
+        <div className="p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
+          <label className="block text-gray-300 font-medium mb-2">Ability:</label>
+          <select 
+            onChange={handlePkmAbilityChange}
+            className="w-full px-3 py-2 bg-[#333c67] border border-gray-600 rounded-lg text-gray-200 focus:border-[#4e60b1] focus:outline-none"
+          >
+            {pkmAbility.map((ability) => {
+              return <option key={ability} value={ability}>{ability}</option>;
+            })}
+          </select>
+        </div>
       </div>
       
       {/* Item Selection */}
