@@ -233,9 +233,9 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
                   <div className="col-span-2 text-center text-gray-400 py-2">-</div>
                 ) : (
                   <>
-                    <div className="flex justify-center">
+                    <div className="text-center text-gray-300 py-2">
                       <select
-                        className="w-12 px-1 py-1 bg-[#333c67] border border-gray-600 rounded text-gray-200 text-center text-sm focus:border-[#4e60b1] focus:outline-none"
+                        className="w-16 px-1 py-1 bg-[#333c67] border border-gray-600 rounded text-gray-200 text-center text-sm focus:border-[#4e60b1] focus:outline-none"
                         id={stat}
                         value={battlepkm.boosts[stat as keyof typeof battlepkm.boosts]}
                         onChange={handleBoostChange}
@@ -243,10 +243,13 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
                         {generateOptions()}
                       </select>
                     </div>
-                    <div className="text-center text-gray-300 py-2">
-                      {battlepkm.boosts[stat as keyof typeof battlepkm.boosts] > 0 
-                        ? `+${battlepkm.boosts[stat as keyof typeof battlepkm.boosts]}`
-                        : battlepkm.boosts[stat as keyof typeof battlepkm.boosts] || "-"}
+                    <div className="text-center text-gray-200 py-2 font-medium">
+                      {Math.floor(battlepkm.stats[stat as keyof typeof battlepkm.stats] * 
+                        (battlepkm.boosts[stat as keyof typeof battlepkm.boosts] >= 0 
+                          ? (2 + battlepkm.boosts[stat as keyof typeof battlepkm.boosts]) / 2
+                          : 2 / (2 - battlepkm.boosts[stat as keyof typeof battlepkm.boosts])
+                        )
+                      )}
                     </div>
                   </>
                 )}
