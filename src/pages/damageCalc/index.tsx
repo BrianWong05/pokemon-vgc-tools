@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import PokemonSelection from "@/components/PokemonSelection";
 import FieldSelection from "@/components/FieldSelection";
 import SideConditions from "@/components/SideConditions";
+import PokemonImportExport from "@/components/PokemonImportExport";
 import CalcMoveDamage from "@/components/CalcMoveDamage";
 import Layout from "@/components/layout";
 import { Generations, Specie } from "@pkmn/data";
@@ -73,6 +74,14 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
       gameType: format === "doubles" ? "Doubles" : "Singles",
     });
     setField(newField);
+  };
+
+  const handleImportAttacker = (pokemon: Pokemon) => {
+    setAtkPkm(pokemon.clone());
+  };
+
+  const handleImportDefender = (pokemon: Pokemon) => {
+    setDefPkm(pokemon.clone());
   };
 
   const cmp = (
@@ -490,6 +499,15 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
                 gens={gens}
                 field={field}
                 onFieldChange={handleFieldChange}
+              />
+
+              {/* Import/Export Section */}
+              <PokemonImportExport
+                gens={gens}
+                atkPkm={atkPkm}
+                defPkm={defPkm}
+                onImportAttacker={handleImportAttacker}
+                onImportDefender={handleImportDefender}
               />
             </div>
 
