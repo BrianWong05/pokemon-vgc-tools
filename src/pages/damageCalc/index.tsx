@@ -2,6 +2,7 @@ import { calculate, Field, Move, Pokemon, Result } from "@smogon/calc";
 import React, { useEffect, useState } from "react";
 import PokemonSelection from "@/components/PokemonSelection";
 import FieldSelection from "@/components/FieldSelection";
+import SideConditions from "@/components/SideConditions";
 import CalcMoveDamage from "@/components/CalcMoveDamage";
 import Layout from "@/components/layout";
 import { Generations, Specie } from "@pkmn/data";
@@ -423,6 +424,15 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
                 onChangePkm={handleAttPkmChange}
                 onChangeStats={handleAttPkmStatsChange}
               />
+              
+              {/* Attacker Side Conditions */}
+              <SideConditions
+                gens={gens}
+                field={field}
+                onFieldChange={handleFieldChange}
+                side="attacker"
+                title="Attacker"
+              />
             </div>
 
             {/* Battle Level and Field Selection - Center Column */}
@@ -494,6 +504,15 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
                 battlepkm={defPkm}
                 onChangePkm={handleDetPkmChange}
                 onChangeStats={handleDefPkmStatsChange}
+              />
+              
+              {/* Defender Side Conditions */}
+              <SideConditions
+                gens={gens}
+                field={field}
+                onFieldChange={handleFieldChange}
+                side="defender"
+                title="Defender"
               />
             </div>
           </div>
