@@ -1,4 +1,4 @@
-import { calculate, Move, Pokemon, Result } from "@smogon/calc";
+import { calculate, Field, Move, Pokemon, Result } from "@smogon/calc";
 import React from "react";
 import { Generation, Generations } from "@pkmn/data";
 
@@ -6,6 +6,7 @@ interface ICalcMoveDamageProps {
   gens: typeof Generations.prototype;
   atkPkm: typeof Pokemon.prototype;
   defPkm: typeof Pokemon.prototype;
+  field: Field;
   onMoveSelect?: (moveIndex: number) => void;
   selectedMoveIndex?: number | null;
   onDefenderMoveSelect?: (moveIndex: number) => void;
@@ -16,6 +17,7 @@ const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({
   gens, 
   atkPkm, 
   defPkm, 
+  field,
   onMoveSelect, 
   selectedMoveIndex, 
   onDefenderMoveSelect, 
@@ -58,7 +60,7 @@ const CalcMoveDamage: React.FunctionComponent<ICalcMoveDamageProps> = ({
       3: { "No Move": "0% - 0%" },
     };
     atkPkm.moves.forEach((move, index) => {
-      const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move)) : null;
+      const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move), field) : null;
       damageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
     });
 

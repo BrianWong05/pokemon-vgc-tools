@@ -1,6 +1,7 @@
 import { calculate, Field, Move, Pokemon, Result } from "@smogon/calc";
 import React, { useEffect, useState } from "react";
 import PokemonSelection from "@/components/PokemonSelection";
+import FieldSelection from "@/components/FieldSelection";
 import CalcMoveDamage from "@/components/CalcMoveDamage";
 import Layout from "@/components/layout";
 import { Generations, Specie } from "@pkmn/data";
@@ -36,6 +37,7 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
 
   const [atkPkm, setAtkPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
   const [defPkm, setDefPkm] = useState(new Pokemon(gen, initPkm.name, { level: initLvl, ivs: initIVs, evs: initEVs }));
+  const [field, setField] = useState(new Field());
   const [resultDesc, setResultDesc] = useState("");
   const [possibleDamage, setPossibleDamage] = useState("");
   const [selectedMoveIndex, setSelectedMoveIndex] = useState<number | null>(null);
@@ -55,6 +57,10 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
 
   const handleDefPkmStatsChange = (pkm: Pokemon) => {
     setDefPkm(pkm.clone());
+  };
+
+  const handleFieldChange = (newField: Field) => {
+    setField(newField);
   };
 
   const cmp = (
@@ -200,7 +206,7 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
   console.log("Result");
 
   atkPkm.moves.forEach((move, index) => {
-    const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move)) : null;
+    const result = move ? calculate(gen, atkPkm, defPkm, new Move(gen, move), field) : null;
     // console.log("result", result);
     damagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
     damageRange[index] = Array.isArray(result?.damage) ? (result.damage as number[]) : [0, 0];
@@ -216,7 +222,7 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
   };
 
   defPkm.moves.forEach((move, index) => {
-    const result = move ? calculate(gen, defPkm, atkPkm, new Move(gen, move)) : null;
+    const result = move ? calculate(gen, defPkm, atkPkm, new Move(gen, move), field) : null;
     defenderDamagePercentageRange[index] = result ? calcDamageRange(result) : { "No Move": "0% - 0%" };
     defenderDamageRange[index] = Array.isArray(result?.damage) ? (result.damage as number[]) : [0, 0];
     defenderRawDescs[index] = (result as ResultWithRawDesc)?.rawDesc || {};
@@ -339,6 +345,7 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
               gens={gens} 
               atkPkm={atkPkm} 
               defPkm={defPkm} 
+              field={field}
               onMoveSelect={(index) => {
                 setSelectedMoveIndex(index);
                 setSelectedDefenderMoveIndex(null);
@@ -391,54 +398,66 @@ const DamageCalc: React.FunctionComponent<IDamageCalcProps> = ({ gens }) => {
         </div>
 
         {/* Pokemon Selection Section */}
-        <div className="flex flex-col lg:flex-row justify-between gap-6 px-4 sm:px-10 pb-10">
-          {/* Attacker Pokemon */}
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">
-              Attacker
-            </h3>
-            <PokemonSelection
-              gens={gens}
-              initPkm={initPkm}
-              battlepkm={atkPkm}
-              onChangePkm={handleAttPkmChange}
-              onChangeStats={handleAttPkmStatsChange}
-            />
-          </div>
-
-          {/* Level Selection */}
-          <div className="flex flex-col items-center justify-center gap-4 lg:mx-8">
-            <h3 className="text-lg font-semibold text-gray-100">Battle Level</h3>
-            <div className="flex flex-col gap-3">
-              <button 
-                value={50} 
-                onClick={handlePkmLvlChange}
-                className="bg-[#4e60b1] hover:bg-[#5a6bc4] text-white px-6 py-3 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] min-w-32"
-              >
-                Level 50
-              </button>
-              <button 
-                value={100} 
-                onClick={handlePkmLvlChange}
-                className="bg-[#4e60b1] hover:bg-[#5a6bc4] text-white px-6 py-3 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] min-w-32"
-              >
-                Level 100
-              </button>
+        <div className="px-4 sm:px-10 pb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Attacker Pokemon */}
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">
+                Attacker
+              </h3>
+              <PokemonSelection
+                gens={gens}
+                initPkm={initPkm}
+                battlepkm={atkPkm}
+                onChangePkm={handleAttPkmChange}
+                onChangeStats={handleAttPkmStatsChange}
+              />
             </div>
-          </div>
 
-          {/* Defender Pokemon */}
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">
-              Defender
-            </h3>
-            <PokemonSelection
-              gens={gens}
-              initPkm={initPkm}
-              battlepkm={defPkm}
-              onChangePkm={handleDetPkmChange}
-              onChangeStats={handleDefPkmStatsChange}
-            />
+            {/* Battle Level and Field Selection - Center Column */}
+            <div className="flex-1">
+              {/* Battle Level Selection */}
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">Battle Level</h3>
+                <div className="flex gap-3 justify-center">
+                  <button 
+                    value={50} 
+                    onClick={handlePkmLvlChange}
+                    className="bg-[#4e60b1] hover:bg-[#5a6bc4] text-white px-4 py-2 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] flex-1"
+                  >
+                    Level 50
+                  </button>
+                  <button 
+                    value={100} 
+                    onClick={handlePkmLvlChange}
+                    className="bg-[#4e60b1] hover:bg-[#5a6bc4] text-white px-4 py-2 rounded-xl font-medium shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#4e60b1] flex-1"
+                  >
+                    Level 100
+                  </button>
+                </div>
+              </div>
+
+              {/* Field Selection */}
+              <FieldSelection
+                gens={gens}
+                field={field}
+                onFieldChange={handleFieldChange}
+              />
+            </div>
+
+            {/* Defender Pokemon */}
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold mb-4 text-center text-gray-100">
+                Defender
+              </h3>
+              <PokemonSelection
+                gens={gens}
+                initPkm={initPkm}
+                battlepkm={defPkm}
+                onChangePkm={handleDetPkmChange}
+                onChangeStats={handleDefPkmStatsChange}
+              />
+            </div>
           </div>
         </div>
       </div>
