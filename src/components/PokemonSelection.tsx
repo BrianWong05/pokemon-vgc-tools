@@ -4,6 +4,7 @@ import PokemonList from "@/pages/PokemonList";
 import NatureList from "@/components/NatureList";
 import MoveList from "@/pages/MoveList";
 import ItemList from "@/pages/ItemList";
+import TypeTag from "@/components/TypeTag";
 import { AbilityName, Generations, Item, MoveData, MoveName, NatureName, Specie } from "@pkmn/data";
 import { Pokemon } from "@smogon/calc";
 
@@ -133,6 +134,12 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
     const value = e.target.value;
 
     battlepkm.ability = value as AbilityName;
+    onChangeStats(battlepkm);
+  };
+
+  const handlePkmTeraTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    battlepkm.teraType = value || undefined;
     onChangeStats(battlepkm);
   };
 
@@ -267,6 +274,43 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
               return <option key={ability} value={ability}>{ability}</option>;
             })}
           </select>
+        </div>
+      </div>
+
+      {/* Tera Type Selection */}
+      <div className="mb-4 p-4 bg-[#24283B] rounded-lg border border-[#4e60b1]">
+        <label className="block text-gray-300 font-medium mb-2">Tera Type:</label>
+        <div className="flex items-center gap-3">
+          <select 
+            value={battlepkm.teraType || ""}
+            onChange={handlePkmTeraTypeChange}
+            className="flex-1 px-3 py-2 bg-[#333c67] border border-gray-600 rounded-lg text-gray-200 focus:border-[#4e60b1] focus:outline-none"
+          >
+            <option value="">None</option>
+            <option value="Normal">Normal</option>
+            <option value="Fire">Fire</option>
+            <option value="Water">Water</option>
+            <option value="Electric">Electric</option>
+            <option value="Grass">Grass</option>
+            <option value="Ice">Ice</option>
+            <option value="Fighting">Fighting</option>
+            <option value="Poison">Poison</option>
+            <option value="Ground">Ground</option>
+            <option value="Flying">Flying</option>
+            <option value="Psychic">Psychic</option>
+            <option value="Bug">Bug</option>
+            <option value="Rock">Rock</option>
+            <option value="Ghost">Ghost</option>
+            <option value="Dragon">Dragon</option>
+            <option value="Dark">Dark</option>
+            <option value="Steel">Steel</option>
+            <option value="Fairy">Fairy</option>
+          </select>
+          {battlepkm.teraType && (
+            <div className="flex-shrink-0">
+              <TypeTag type={battlepkm.teraType.toLowerCase()} />
+            </div>
+          )}
         </div>
       </div>
       
