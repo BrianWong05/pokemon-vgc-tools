@@ -143,6 +143,8 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
     onChangeStats(battlepkm);
   };
 
+  const scrollParentRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <div className="bg-[#333c67] rounded-xl p-6 shadow-lg border border-[#4e60b1] text-gray-200">
       {/* Pokemon Selection Button */}
@@ -153,12 +155,18 @@ const PokemonSelection: React.FunctionComponent<IPokemonSelectionProps> = ({
         Select Pokemon
       </button>
       <PopUp
+        ref={scrollParentRef}
         isOpen={isPkmOpen}
         onClose={() => {
           setIsPkmOpen(false);
         }}
       >
-        <PokemonList gens={gens} onData={handleSeledtedPkm} hidden={true} />
+        <PokemonList
+          gens={gens}
+          onData={handleSeledtedPkm}
+          hidden={true}
+          scrollContainer={scrollParentRef.current}
+        />
       </PopUp>
       
       {/* Selected Pokemon Display */}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import SearchBar from "@/components/SearchBar";
 import Pokemon from "@/components/Pokemon";
 import PokemonFilter from "@/components/PokemonFilter";
@@ -10,9 +11,15 @@ interface IPokemonListProps {
   gens: Generations;
   onData?: (pkm: Specie) => void;
   hidden?: boolean;
+  scrollContainer?: HTMLDivElement | null;
 }
 
-const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData, hidden = false }) => {
+const PokemonList: React.FunctionComponent<IPokemonListProps> = ({
+  gens,
+  onData,
+  hidden = false,
+  scrollContainer,
+}) => {
   const pkms = useMemo(() => Array.from(gens.get(9).species), [gens]);
 
   const [searchResults, setSearchResults] = useState<typeof pkms>([]);
@@ -23,6 +30,31 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
   const [sortBy, setSortBy] = useState<string>("num");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
+  // Virtualization state
+  const parentRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 0);
+  
+  const isPopup = !!scrollContainer;
+
+  // Measure container width for responsive columns
+  useEffect(() => {
+    if (!parentRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    resizeObserver.observe(parentRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  // Calculate columns - assuming approx 610px per card (adjust as needed based on Pokemon.tsx)
+  // Pokemon.tsx uses w-150 (approx 600px).
+  // Let's assume a safe minimum width for the responsive grid.
+  const ITEM_WIDTH = 610; 
+  const columns = Math.max(1, Math.floor(containerWidth / ITEM_WIDTH));
+  
   // Initialize search results when pkms changes
   useEffect(() => {
     setSearchResults(pkms);
@@ -54,7 +86,7 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
       } else {
         // AND logic: Pokemon must have all selected types
         filteredResults = filteredResults.filter((pkm) =>
-          selectedTypes.every((selectedType) => pkm.types.some(type => type === selectedType)),
+          selectedTypes.every((selectedType) => pkm.types.some((type) => type === selectedType)),
         );
       }
     }
@@ -121,14 +153,32 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
     setSortOrder(newSortOrder);
   };
 
-  // console.log(pkms[0]);
+  // Virtualization Logic
+  const rowCount = Math.ceil(searchResults.length / columns);
+  
+  // Estimate height to prevent initial overlap
+  const ESTIMATED_ROW_HEIGHT = 180;
+
+  // Utilize a dedicated scroll container for the Main Page to ensure consistent virtualization
+  // This avoids issues with window scrolling offsets and sticky headers.
+  const virtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollContainer || parentRef.current,
+    estimateSize: () => ESTIMATED_ROW_HEIGHT,
+    overscan: 5,
+  });
+
+  const virtualItems = virtualizer.getVirtualItems();
 
   return (
     <Layout hidden={hidden}>
-      <div className="bg-[#24283B] w-full pt-15">
+      <div 
+        className={`${isPopup ? "bg-[#24283B] w-full" : "fixed inset-0 w-full h-full overflow-y-auto bg-[#24283B] z-0 pt-20"}`} 
+        ref={parentRef}
+      >
         <div className="sticky -top-2 bg-[#24283B50] pb-7 z-10 backdrop-blur-xs">
           <div className="text-3xl text-center text-gray-200 h-25 pt-10 backdrop-blur">Pokemon</div>
-          
+
           {/* Search Bar and Sort Side by Side */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center px-4">
             <div className="w-full sm:w-auto flex-1 max-w-xl">
@@ -153,11 +203,51 @@ const PokemonList: React.FunctionComponent<IPokemonListProps> = ({ gens, onData,
             />
           </div>
         </div>
-        <div className="flex flex-wrap justify-evenly pt-8">
-          {searchResults.map((pkm) => {
-            return <Pokemon key={pkm.id} pkm={pkm} onData={onData} />;
-          })}
+
+        {/* Virtualized Grid */}
+        <div
+            ref={gridRef}
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            {virtualItems.map((virtualRow) => {
+              const start = virtualRow.index * columns;
+              const end = Math.min(start + columns, searchResults.length);
+              const items = searchResults.slice(start, end);
+
+              return (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                  className="flex justify-evenly"
+                >
+                  {items.map((pkm) => (
+                    <div key={pkm.id} style={{ width: `${100/columns}%`, display: 'flex', justifyContent: 'center' }}>
+                         <Pokemon pkm={pkm} onData={onData} />
+                    </div>
+                  ))}
+                  {/* Fill empty columns if last row */}
+                  {items.length < columns && 
+                    Array.from({ length: columns - items.length }).map((_, i) => (
+                        <div key={`empty-${i}`} style={{ width: `${100/columns}%` }} />
+                    ))
+                  }
+                </div>
+              );
+            })}
         </div>
+        
         {searchResults.length === 0 && (
           <div className="text-center text-gray-400 py-10">No Pokemon found matching your criteria.</div>
         )}
